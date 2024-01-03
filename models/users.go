@@ -28,5 +28,7 @@ func init() {
 
 	orm.RegisterModel(new(Users))
 
+	orm.RegisterModel(new(GogsDB))
+
 	orm.RunSyncdb("default", false, true)
 }

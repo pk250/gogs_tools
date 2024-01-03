@@ -13,7 +13,10 @@ type BaseController struct {
 
 func (this *BaseController) Prepare() {
 	users := this.Ctx.Input.Session("UserData")
-	if users == nil && this.Ctx.Request.RequestURI != "/login" && this.Ctx.Request.RequestURI != "/register" {
+	if users == nil &&
+		this.Ctx.Request.RequestURI != "/login" &&
+		this.Ctx.Request.RequestURI != "/register" &&
+		this.Ctx.Request.RequestURI != "/gogs" {
 		this.Ctx.Redirect(302, "/login")
 	} else if users != nil {
 		o := orm.NewOrm()

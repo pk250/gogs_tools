@@ -13,4 +13,5 @@ func init() {
 	beego.Router("/logout", &controllers.LogoutController{})
 	beego.AutoRouter(&controllers.ListsController{})
 	beego.AutoRouter(&controllers.LayoutController{})
+	beego.Router("/gogs", &controllers.GogsControllers{})
 }

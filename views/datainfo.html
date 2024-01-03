@@ -60,16 +60,21 @@
                                         <td class="footable-visible" style="text-align: center; ">{{.CommitAuth}}</td>
                                         {{if .CompileStatus}}
                                         <td class="footable-visible" style="text-align: center; "><span class="label-primary">已编译</span></td>
-                                        {{else}}
-                                        <td class="footable-visible" style="text-align: center; "><span class="label">未编译</span></td>
-                                        {{end}}
                                         <td class="footable-visible" style="text-align: center; "><span class="label">{{.CompileUser}}</span></td>
                                         <td class="footable-visible" style="text-align: center; "><span class="label">{{.CompileTime}}</span></td>
+                                        {{else}}
+                                        <td class="footable-visible" style="text-align: center; "><span class="label">未编译</span></td>
+                                        <td class="footable-visible" style="text-align: center; "><span class="label">NULL</span></td>
+                                        <td class="footable-visible" style="text-align: center; "><span class="label">NULL</span></td>
+                                        {{end}}
+                                        
                                         <td class="footable-visible" style="text-align: center; ">
                                             <div class="btn-group">
+                                                {{if .CompileStatus}}
                                                 <a href="{{.CompilePath}}" class="btn btn-outline btn-primary">
                                                     下载
                                                 </a>
+                                                {{end}}
                                                 <a href="#" class="btn btn-outline btn-primary">
                                                     编译
                                                 </a>
@@ -93,6 +98,7 @@
                                 <button type="button" class="btn btn-white">
                                     <i class="fa fa-chevron-left"></i>
                                 </button>
+                                
                                 <button class="btn btn-primary active">1</button>
                                 <button class="btn btn-white">2</button>
                                 <button class="btn btn-white">3</button>

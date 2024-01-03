@@ -8,12 +8,12 @@ import (
 
 type Datainfos struct {
 	Id            int64
-	StorageName   string    `orm:"size(128);unique"`
-	CommitValue   string    `orm:"size(32)"`
-	CommitTime    string    `orm:"size(64)"`
+	StorageName   string `orm:"size(128)"`
+	CommitValue   string `orm:"size(64);unique"`
+	CommitTime    time.Time
 	CommitAuth    string    `orm:"size(64)"`
 	CompileStatus bool      `orm:"default(false)"`
-	CompileUser   string    `orm:"size(64)"`
-	CompileTime   time.Time `orm:"type(datetime)"`
-	CompilePath   string    `orm:"size(128)"`
+	CompileUser   string    `orm:"size(64);null"`
+	CompileTime   time.Time `orm:"null"`
+	CompilePath   string    `orm:"size(128);null"`
 }

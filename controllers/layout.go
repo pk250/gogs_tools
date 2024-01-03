@@ -3,6 +3,7 @@ package controllers
 import (
 	"gogs_tools/models"
 	"log"
+	"strconv"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -13,17 +14,32 @@ type LayoutController struct {
 
 func (this *LayoutController) Datainfo() {
 	datainfos := make([]models.Datainfos, 0)
-
 	o := orm.NewOrm()
 
+	pages := this.Ctx.Input.Params()
 	qs := o.QueryTable("datainfos")
-
-	_, err := qs.Limit(10, 0).All(&datainfos)
-
+	count, err := qs.Count()
 	if err != nil {
 		log.Println("err:", err)
+	}
+	this.Data["count"] = count
+	if len(pages) > 0 {
+		num, _ := strconv.ParseInt(pages["0"], 10, 64)
+		_, err := qs.Limit(10, 10*(num-1)).All(&datainfos)
+		if err != nil {
+			log.Println("err:", err)
+		} else {
+			this.Data["datainfo"] = datainfos
+			this.Data["pages"] = num
+		}
 	} else {
-		this.Data["datainfo"] = datainfos
+		_, err := qs.Limit(10, 0).All(&datainfos)
+		if err != nil {
+			log.Println("err:", err)
+		} else {
+			this.Data["datainfo"] = datainfos
+			this.Data["pages"] = 1
+		}
 	}
 
 	log.Println(datainfos)
