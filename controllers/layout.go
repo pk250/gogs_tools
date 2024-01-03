@@ -3,12 +3,20 @@ package controllers
 import (
 	"gogs_tools/models"
 	"log"
+	"net/http"
 
 	"github.com/astaxie/beego/orm"
+	"github.com/gorilla/websocket"
 )
 
 type LayoutController struct {
 	BaseController
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func (this *LayoutController) Datainfo() {
@@ -26,18 +34,53 @@ func (this *LayoutController) Datainfo() {
 		this.Data["datainfo"] = datainfos
 	}
 
-	log.Println(datainfos)
-
-	this.Layout = "index.html"
-	this.TplName = "datainfo.html"
+	this.Data["menu"] = "datainfo"
+	this.Layout = "index.tpl"
+	this.TplName = "datainfo.tpl"
 }
 
 func (this *LayoutController) Compile() {
-	this.Layout = "index.html"
-	this.TplName = "compile.html"
+	this.Data["menu"] = "compile"
+	this.Layout = "index.tpl"
+	this.TplName = "compile.tpl"
 }
 
 func (this *LayoutController) Knowledge() {
-	this.Layout = "index.html"
-	this.TplName = "knowledge.html"
+	this.Data["menu"] = "knowledge"
+	this.Layout = "index.tpl"
+	this.TplName = "knowledge.tpl"
+}
+
+func (this *LayoutController) Messages() {
+	this.Data["menu"] = "messages"
+	this.Layout = "index.tpl"
+	this.TplName = "knowledge.tpl"
+}
+
+func (this *LayoutController) Account() {
+	this.Data["menu"] = "account"
+	this.Layout = "index.tpl"
+	this.TplName = "knowledge.tpl"
+}
+
+func (this *LayoutController) Compilews() {
+	Servews(this)
+	this.EnableRender = false
+}
+
+func Servews(this *LayoutController) {
+	// hashCode := this.GetString("hashCode")
+
+	conn, err := upgrader.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	// go func() {
+	err = conn.WriteMessage(websocket.TextMessage, []byte("hello"))
+	if err != nil {
+		panic(err)
+	}
+
+	// }()
 }

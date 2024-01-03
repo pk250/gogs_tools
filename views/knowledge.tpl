@@ -1,0 +1,187 @@
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox-content m-b-sm border-bottom">
+                <div class="p-xs">
+                    <div class="float-right search btn-group">
+                        <input class="form-control search-input" type="text" placeholder="搜索" autocomplete="off">
+                        <a href="#"><i class="fa fa-search fa-3x"></i></a>
+                    </div>
+                    <div class="float-left m-r-md">
+                        <i class="fa fa-globe text-navy mid-icon"></i>
+                    </div>
+                    <h2>欢迎来到知识论坛</h2>
+                    <span>寻找自己想要的知识</span>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>问题列表</h5>
+                    <div class="ibox-tools">
+                        <a class="btn btn-primary btn-xs" href="#">添加新问题</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="bootstrap-table bootstrap4">
+                        <div class="table-responsive">
+                            <table class="table table-hover issue-tracker">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="label label-danger">BUG</span>
+                                        </td>
+                                        <td class="issue-info">
+                                            <a href="#">
+                                                CAN离线异常处理
+                                            </a>
+                                            <small>
+                                                在CAN总线上存在相同CAN ID的数据时，会引起这两个设备因TEC溢出导致CAN离线
+                                            </small>
+                                        </td>
+                                        <td>
+                                            liu_daohuang
+                                        </td>
+                                        <td>
+                                            2023.09.17 23:10:56
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <i class="fa fa-comments-o">
+                                                    54 评论
+                                                </i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-eye">
+                                                    103 浏览
+                                                </i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="label label-danger">BUG</span>
+                                        </td>
+                                        <td class="issue-info">
+                                            <a href="#">
+                                                CAN离线异常处理
+                                            </a>
+                                            <small>
+                                                在CAN总线上存在相同CAN ID的数据时，会引起这两个设备因TEC溢出导致CAN离线
+                                            </small>
+                                        </td>
+                                        <td>
+                                            liu_daohuang
+                                        </td>
+                                        <td>
+                                            2023.09.17 23:10:56
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <i class="fa fa-comments-o">
+                                                    54 评论
+                                                </i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-eye">
+                                                    103 浏览
+                                                </i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="label label-danger">BUG</span>
+                                        </td>
+                                        <td class="issue-info">
+                                            <a href="#">
+                                                CAN离线异常处理
+                                            </a>
+                                            <small>
+                                                在CAN总线上存在相同CAN ID的数据时，会引起这两个设备因TEC溢出导致CAN离线
+                                            </small>
+                                        </td>
+                                        <td>
+                                            liu_daohuang
+                                        </td>
+                                        <td>
+                                            2023.09.17 23:10:56
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <i class="fa fa-comments-o">
+                                                    54 评论
+                                                </i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-eye">
+                                                    103 浏览
+                                                </i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="label label-danger">BUG</span>
+                                        </td>
+                                        <td class="issue-info">
+                                            <a href="#">
+                                                CAN离线异常处理
+                                            </a>
+                                            <small>
+                                                在CAN总线上存在相同CAN ID的数据时，会引起这两个设备因TEC溢出导致CAN离线
+                                            </small>
+                                        </td>
+                                        <td>
+                                            liu_daohuang
+                                        </td>
+                                        <td>
+                                            2023.09.17 23:10:56
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <i class="fa fa-comments-o">
+                                                    54 评论
+                                                </i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-eye">
+                                                    103 浏览
+                                                </i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="fixed-table-pagination">
+                            <div class="float-left pagination-detail"></div>
+                            <div class="float-right pagination">
+                                <button type="button" class="btn btn-white">
+                                    <i class="fa fa-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-primary active">1</button>
+                                <button class="btn btn-white">2</button>
+                                <button class="btn btn-white">3</button>
+                                <button class="btn btn-white">4</button>
+                                <button class="btn btn-white">5</button>
+                                <button type="button" class="btn btn-white">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

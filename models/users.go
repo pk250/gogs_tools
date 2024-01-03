@@ -22,7 +22,7 @@ type Users struct {
 }
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3306)/gogs?charset=utf8")
+	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/gogs?charset=utf8")
 
 	orm.RegisterModel(new(Datainfos))
 

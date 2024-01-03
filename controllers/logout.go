@@ -6,5 +6,5 @@ type LogoutController struct {
 
 func (this *LogoutController) Get() {
 	this.Ctx.Input.CruSession.Delete("UserData")
-	this.TplName = "login.html"
+	this.TplName = "login.tpl"
 }
