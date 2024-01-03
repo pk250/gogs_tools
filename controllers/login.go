@@ -11,7 +11,7 @@ type LoginController struct {
 }
 
 func (this *LoginController) Get() {
-	this.TplName = "login.html"
+	this.TplName = "login.tpl"
 }
 
 func (this *LoginController) Post() {

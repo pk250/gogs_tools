@@ -9,3 +9,9 @@ func (this *ListsController) Compile() {
 	this.ServeJSON()
 	return
 }
+
+func (this *ListsController) Commit() {
+	this.Data["json"] = map[string]interface{}{"status": "1", "msg": "success"}
+	this.ServeJSON()
+	return
+}

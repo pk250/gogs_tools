@@ -12,7 +12,7 @@ type RegisterController struct {
 }
 
 func (this *RegisterController) Get() {
-	this.TplName = "register.html"
+	this.TplName = "register.tpl"
 }
 
 func (this *RegisterController) Post() {
