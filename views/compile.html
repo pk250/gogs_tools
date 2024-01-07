@@ -1,0 +1,140 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>
+                    编译信息
+                </h5>
+            </div>
+            <div class="ibox-content">
+                <form id="compile" method="post" onsubmit="return false">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">MDK版本</label>
+                        <div class="col-sm-10">
+                            <select id="mdkVersion" class="form-control m-b" name="mdkVersion">
+                                <option value="1">MDK5</option>
+                                <option value="2">MDK4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">仓库链接</label>
+                        <div class="col-sm-10">
+                            <input id="urlPath" type="text" class="form-control" name="urlPath">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Commit</label>
+                        <div class="col-sm-10">
+                            <input id="commitValue" type="text" class="form-control" name="commitValue">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">工程文件名</label>
+                        <div class="col-sm-10">
+                            <input id="projectName" type="text" class="form-control" name="projectName" value="project.uvprojx">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button class="btn btn-white btn-sm" type="reset">取消</button>
+                            <button class="btn btn-primary btn-sm" onclick="Compile()">编译</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>logs</h5>
+            </div>
+            <div class="ibox-content">
+                <textarea id="logs" readonly> 
+                </textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div>
+        <strong>Copyright</strong> Dakewe &copy; 2023-2033
+    </div>
+</div>
+<script>
+    var logs;
+    function WriteLogs(log) {
+        //!<获取时间
+        logs.setValue(logs.getValue()+log);
+    }
+
+    function form2json() {
+        var mdkVersion = $('#mdkVersion').val();
+        var urlPath = $('#urlPath').val();
+        var commitValue = $('#commitValue').val();
+        var projectName = $('#projectName').val();
+        var jObj = {
+            mdkVersion:mdkVersion,
+            urlPath:urlPath,
+            commitValue:commitValue,
+            projectName:projectName
+        };
+        return JSON.stringify(jObj);
+    }
+
+    function StartWs() {
+        var ws = new WebSocket('ws://'+window.location.host+'/lists/ws');
+        ws.onmessage = function(e) {
+            const reader = new FileReader();
+            reader.readAsText(e.data,"utf8");
+            reader.onload = (e) => {
+                
+            }
+            reader.onloadend = (e) => {
+                console.log(reader.result);
+                WriteLogs(reader.result);
+            }
+            
+        }
+        ws.onopen = function() {
+            console.log("WebSocket connection opened.");
+            
+            ws.send(form2json());
+        };
+        ws.onclose = function() {
+            console.log("WebSocket connection closed.");
+        };
+        ws.onerror = function(e) {
+            console.log("WebSocket error: " + e.data);
+        };
+    }
+
+    function Compile(){
+        StartWs();
+        $.ajax({
+            url: '/lists/compile',
+            type: 'POST',
+            data: $("form").serializeArray(),
+            success: function(res) {
+                console.log(res);
+            }
+        });
+        logs.setValue("");
+        return false;
+    }
+
+    $(document).ready(function() {
+        
+
+        logs = CodeMirror.fromTextArea(document.getElementById("logs"),{
+            lineNumbers:true,
+            matchBrackets:true,
+            styleActiveLine:true,
+            theme:"ambiance",
+            readOnly:true
+        });
+        
+    });
+
+</script>

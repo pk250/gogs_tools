@@ -1,0 +1,97 @@
+
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>编译列表</h5>
+
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <input type="text" class="form-control form-control-sm m-b-xs" id="filter" placeholder="搜索">
+                    <table class="footable table table-stripped toggle-arrow-tiny" data-filter=#filter>
+                        <thead>
+                        <tr>
+                            <th data-toggle="true">仓库名称</th>
+                            <th>commit</th>
+                            <th>作者</th>
+                            <th>提交时间</th>
+                            <th data-hide="all">提交日志</th>
+                            <th data-hide="all">编译状态</th>
+                            <th data-hide="all">编译时间</th>
+                            <th data-hide="all">编译者</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range .datainfo}}
+                        <tr>
+                            <td>{{.StorageName}}</td>
+                            <td>{{.CommitValue}}</td>
+                            <td>{{.CommitAuth}}</td>
+                            <td>{{.CommitTime}}</td>
+                            <td>{{.CommitLogs}}</td>
+                            {{if .CompileStatus}}
+                            <td>已编译</td>
+                            <td>{{.CompileTime}}</td>
+                            <td>{{.CompileUser}}</td>
+                            <td>
+                                <a href="{{.CompilePath}}" class="btn btn-outline btn-primary">
+                                    下载
+                                </a>
+                                <a href="#" class="btn btn-outline btn-primary">
+                                    编译
+                                </a>
+                            </td>
+                            {{else}}
+                            <td>未编译</td>
+                            <td>NULL</td>
+                            <td>NULL</td>
+                            <td>
+                                <a href="#" class="btn btn-outline btn-primary">
+                                    编译
+                                </a>
+                            </td>
+                            {{end}}
+                        </tr>
+                        {{end}}
+                        
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <ul class="pagination float-right"></ul>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div>
+        <strong>Copyright</strong> Dakewe &copy; 2023-2033
+    </div>
+</div>
+
+</div>
+</div>
+<script>
+    $(document).ready(function() {
+
+        $('.footable').footable();
+    });
+
+</script>

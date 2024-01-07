@@ -42,6 +42,7 @@ func (this *GogsControllers) Post() {
 				CommitValue: commit.Id,
 				CommitTime:  commit.Timestamp,
 				CommitAuth:  commit.Author.Name,
+				CommitLogs:  commit.Message,
 			}
 			_, err = o.Insert(&datainfo)
 			if err != nil {

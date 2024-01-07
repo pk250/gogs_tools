@@ -10,6 +10,7 @@ type Datainfos struct {
 	Id            int64
 	StorageName   string `orm:"size(128)"`
 	CommitValue   string `orm:"size(64);unique"`
+	CommitLogs    string
 	CommitTime    time.Time
 	CommitAuth    string    `orm:"size(64)"`
 	CompileStatus bool      `orm:"default(false)"`
