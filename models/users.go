@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -22,7 +23,7 @@ type Users struct {
 }
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3306)/gogs?charset=utf8")
+	orm.RegisterDataBase("default", "mysql", beego.AppConfig.String("sqlconn"))
 
 	orm.RegisterModel(new(Datainfos))
 

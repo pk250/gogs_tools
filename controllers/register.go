@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"gogs_tools/models"
-	"os/user"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -25,24 +24,26 @@ func (this *RegisterController) Post() {
 		this.ServeJSON()
 		return
 	}
-
-	_, err := user.Lookup(username)
-	if err == nil {
+	o := orm.NewOrm()
+	user := models.Users{Username: username}
+	err := o.Read(&user, "Username")
+	if err == orm.ErrNoRows {
+		user.Email = email
+		user.Password = password
+		_, err = o.Insert(&user)
+		if err != nil {
+			this.Data["json"] = map[string]interface{}{"status": 0, "msg": "注册失败"}
+			this.ServeJSON()
+			return
+		} else {
+			this.SetSession("UserData", user)
+			this.Data["json"] = map[string]interface{}{"status": 1, "msg": "注册成功", "url": "/"}
+			this.ServeJSON()
+			return
+		}
+	} else if err == nil {
 		this.Data["json"] = map[string]interface{}{"status": 0, "msg": "用户名已存在"}
 		this.ServeJSON()
 		return
 	}
-
-	o := orm.NewOrm()
-	user := models.Users{Username: username, Password: password, Email: email}
-	_, err = o.Insert(&user)
-	if err != nil {
-		this.Data["json"] = map[string]interface{}{"status": 0, "msg": "注册失败"}
-		this.ServeJSON()
-		return
-	}
-
-	this.Data["json"] = map[string]interface{}{"status": 1, "msg": "注册成功", "url": "/login"}
-	this.ServeJSON()
-	return
 }

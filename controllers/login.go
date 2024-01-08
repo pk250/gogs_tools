@@ -33,6 +33,7 @@ func (this *LoginController) Post() {
 		return
 	}
 
+	o.Update(&user)
 	this.SetSession("UserData", user)
 	this.Data["json"] = map[string]interface{}{"status": 1, "msg": "登录成功", "url": "/"}
 	this.ServeJSON()
