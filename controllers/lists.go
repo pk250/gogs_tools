@@ -31,12 +31,27 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func GetProjectFile(path string, name string) string {
+func GetProjectFileName(path string, name string) string {
 	var result string
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		//log.Println(path, "---", info.Name())
 		if name == info.Name() {
 			result = path
+		}
+		return nil
+	})
+	if err != nil {
+		log.Panic(err)
+	}
+	return result
+}
+
+func GetFileListForType(fpath string, ty string) []string {
+	var result []string
+	err := filepath.Walk(fpath, func(path string, info os.FileInfo, err error) error {
+		//log.Println(path, "---", info.Name())
+		if ty == filepath.Ext(info.Name()) {
+			result = append(result, path)
 		}
 		return nil
 	})
@@ -80,7 +95,7 @@ func WriteLogsWs(ws *websocket.Conn, logs string) {
 }
 
 func ReadLogs(ws *websocket.Conn, path string, name string) {
-	file, err := os.Open(GetProjectFile(path, name))
+	file, err := os.Open(GetProjectFileName(path, name))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -151,7 +166,7 @@ func CreateCompileTask(this *ListsController) {
 	//!<开始查找工程文件
 	WriteLogsWs(ws, "开始查找工程文件\r\n")
 
-	pjPath := GetProjectFile(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, msg.ProjectName)
+	pjPath := GetProjectFileName(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, msg.ProjectName)
 
 	WriteLogsWs(ws, pjPath+"\r\n")
 	WriteLogsWs(ws, "开始编译\r\n")
@@ -160,6 +175,10 @@ func CreateCompileTask(this *ListsController) {
 	WriteCmdWs(ws, cmd)
 	WriteLogsWs(ws, "获取编译日志\r\n")
 	ReadLogs(ws, beego.AppConfig.String("ClonePath")+"/"+msg.Commit, "build_log.txt")
+
+	//!<打包编译好的文件
+	//!<step 1 查找编译出来的bin、axf、hex、map文件
+	GetFileListForType(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, ".bin")
 
 	os.RemoveAll(beego.AppConfig.String("ClonePath") + "/" + msg.Commit)
 	ws.Close()
