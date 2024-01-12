@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"archive/zip"
 	"bufio"
 	"encoding/json"
 	"io"
@@ -46,12 +47,19 @@ func GetProjectFileName(path string, name string) string {
 	return result
 }
 
-func GetFileListForType(fpath string, ty string) []string {
-	var result []string
+func GetFileListForType(fpath string, ty ...string) []string {
+	var result, tys []string
+
+	for _, v := range ty {
+		tys = append(tys, filepath.Ext(v))
+	}
+
 	err := filepath.Walk(fpath, func(path string, info os.FileInfo, err error) error {
 		//log.Println(path, "---", info.Name())
-		if ty == filepath.Ext(info.Name()) {
-			result = append(result, path)
+		for _, v := range tys {
+			if v == filepath.Ext(path) {
+				result = append(result, path)
+			}
 		}
 		return nil
 	})
@@ -59,6 +67,40 @@ func GetFileListForType(fpath string, ty string) []string {
 		log.Panic(err)
 	}
 	return result
+}
+
+func SaveBinaryFile(sourcePath []string, targetPath string) error {
+
+	zipFile, err := os.Create(targetPath + ".zip")
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+	zipWriter := zip.NewWriter(zipFile)
+
+	for _, spath := range sourcePath {
+		//!<获取文件名
+		name := filepath.Base(spath)
+		//!<在压缩包中创建文件
+		fileWriter, err := zipWriter.Create(name)
+		if err != nil {
+			return err
+		}
+		//!<打开待压缩文件
+		file, err := os.Open(spath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		//!<拷贝文件到压缩包
+		if _, err = io.Copy(fileWriter, file); err != nil {
+			return err
+		}
+	}
+
+	zipWriter.Close()
+
+	return nil
 }
 
 func WriteCmdWs(ws *websocket.Conn, cmd *exec.Cmd) {
@@ -94,10 +136,11 @@ func WriteLogsWs(ws *websocket.Conn, logs string) {
 	}
 }
 
-func ReadLogs(ws *websocket.Conn, path string, name string) {
-	file, err := os.Open(GetProjectFileName(path, name))
+func ReadLogs(ws *websocket.Conn, path string, name string) (string, error) {
+	logsPath := GetProjectFileName(path, name)
+	file, err := os.Open(logsPath)
 	if err != nil {
-		log.Panic(err)
+		return logsPath, err
 	}
 	defer file.Close()
 	reader := bufio.NewReader(file)
@@ -108,15 +151,16 @@ func ReadLogs(ws *websocket.Conn, path string, name string) {
 		}
 		err = ws.WriteMessage(websocket.BinaryMessage, line)
 		if err != nil {
-			log.Panic(err)
 			ws.Close()
+			return logsPath, err
 		}
 		err = ws.WriteMessage(websocket.BinaryMessage, []byte("\r\n"))
 		if err != nil {
-			log.Panic(err)
 			ws.Close()
+			return logsPath, err
 		}
 	}
+	return logsPath, nil
 }
 
 func CreateCompileTask(this *ListsController) {
@@ -174,12 +218,17 @@ func CreateCompileTask(this *ListsController) {
 	//cmd.Dir = beego.AppConfig.String("ClonePath") + "/" + commit
 	WriteCmdWs(ws, cmd)
 	WriteLogsWs(ws, "获取编译日志\r\n")
-	ReadLogs(ws, beego.AppConfig.String("ClonePath")+"/"+msg.Commit, "build_log.txt")
+	logsPath, err := ReadLogs(ws, beego.AppConfig.String("ClonePath")+"/"+msg.Commit, "build_log.txt")
+	if err != nil {
+		log.Panic(err)
+	}
 
 	//!<打包编译好的文件
 	//!<step 1 查找编译出来的bin、axf、hex、map文件
-	GetFileListForType(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, ".bin")
-
+	files := GetFileListForType(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, ".bin", ".axf", ".hex", ".map")
+	files = append(files, logsPath)
+	SaveBinaryFile(files, beego.AppConfig.String("binout")+"/"+msg.Commit)
+	//!<step 2 保存日志文件
 	os.RemoveAll(beego.AppConfig.String("ClonePath") + "/" + msg.Commit)
 	ws.Close()
 }
