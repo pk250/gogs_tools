@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/gorilla/websocket"
@@ -69,9 +70,16 @@ func GetFileListForType(fpath string, ty ...string) []string {
 	return result
 }
 
-func SaveBinaryFile(sourcePath []string, targetPath string) error {
+func GetTimeString() string {
+	return beego.Date(time.Now(), "YmdHi")
+}
 
-	zipFile, err := os.Create(targetPath + ".zip")
+func SaveBinaryFile(sourcePath []string, targetPath string) error {
+	//!<创建文件夹
+	if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
+		return err
+	}
+	zipFile, err := os.Create(targetPath + "/" + GetTimeString() + ".zip")
 	if err != nil {
 		return err
 	}
@@ -227,10 +235,14 @@ func CreateCompileTask(this *ListsController) {
 	//!<step 1 查找编译出来的bin、axf、hex、map文件
 	files := GetFileListForType(beego.AppConfig.String("ClonePath")+"/"+msg.Commit, ".bin", ".axf", ".hex", ".map")
 	files = append(files, logsPath)
-	SaveBinaryFile(files, beego.AppConfig.String("binout")+"/"+msg.Commit)
-	//!<step 2 保存日志文件
-	os.RemoveAll(beego.AppConfig.String("ClonePath") + "/" + msg.Commit)
+	if err = SaveBinaryFile(files, beego.AppConfig.String("binout")+"/"+msg.Commit); err != nil {
+		log.Panic(err)
+	}
 	ws.Close()
+	//!<删除本地仓库
+	if err := os.RemoveAll(beego.AppConfig.String("ClonePath") + "/" + msg.Commit); err != nil {
+		log.Panic(err)
+	}
 }
 
 func (this *ListsController) Compile() {
