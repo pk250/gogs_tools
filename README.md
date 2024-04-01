@@ -1,5 +1,3 @@
----
-
 # `pk250/gogs_tools` - Gogs的Keil自动编译平台
 
 `pk250/gogs_tools`是一个为Gogs设计的自动编译平台，它能够与Keil集成开发环境无缝对接，实现代码的自动编译和测试。这个工具旨在提高开发者的工作效率，简化嵌入式开发流程。
@@ -45,5 +43,3 @@
 ## 许可证
 
 `pk250/gogs_tools`项目根据[MIT License](https://github.com/pk250/gogs_tools/blob/master/LICENSE)发布。
-
----
