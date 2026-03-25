@@ -18,9 +18,11 @@ func (this *GogsControllers) Post() {
 	var gogs models.Gogs
 	var info []string
 	data := this.Ctx.Input.RequestBody
-	err := json.Unmarshal(data, &gogs)
-	if err != nil {
-		panic(err)
+	if err := json.Unmarshal(data, &gogs); err != nil {
+		this.Ctx.ResponseWriter.WriteHeader(400)
+		this.Data["json"] = map[string]interface{}{"status": 0, "msg": "请求体解析失败"}
+		this.ServeJSON()
+		return
 	}
 
 	o := orm.NewOrm()
@@ -34,7 +36,7 @@ func (this *GogsControllers) Post() {
 			Push_Email: gogs.Pusher.Email, Sender_Username: gogs.Sender.Username,
 			Sender_Email: gogs.Sender.Email,
 		}
-		_, err = o.Insert(&gogsDB)
+		_, err := o.Insert(&gogsDB)
 		if err != nil {
 			info = append(info, "gogs insert fail:"+commit.Id)
 		} else {
@@ -46,10 +48,10 @@ func (this *GogsControllers) Post() {
 				CommitAuth:  commit.Author.Name,
 				CommitLogs:  commit.Message,
 			}
-			_, err = o.Insert(&datainfo)
-			if err != nil {
+			_, err2 := o.Insert(&datainfo)
+			if err2 != nil {
 				info = append(info, "datainfo insert fail:"+commit.Id)
-				fmt.Print(err)
+				fmt.Print(err2)
 			} else {
 				// 判断触发模式，自动模式则入队
 				repoConfig := models.RepoConfig{RepoName: gogs.Repository.Name}

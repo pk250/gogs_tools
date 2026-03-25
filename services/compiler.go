@@ -34,6 +34,15 @@ func init() {
 // BroadcastLog 可注入的 WebSocket 广播钩子，默认 noop，Story 1-6 绑定实现
 var BroadcastLog func(taskId int64, line string) = func(int64, string) {}
 
+// reposBaseDir 返回仓库根目录，优先读取 SysConfig，回退到默认值
+func reposBaseDir(o orm.Ormer) string {
+	var c models.SysConfig
+	if err := o.QueryTable("sys_config").Filter("ConfigKey", models.ConfigKeyReposBase).One(&c); err == nil && c.ConfigVal != "" {
+		return c.ConfigVal
+	}
+	return ReposBaseDir
+}
+
 // Run 执行 Keil 编译流程，返回 nil 表示编译成功（退出码 0）
 func Run(task models.BuildTask) error {
 	o := orm.NewOrm()
@@ -51,7 +60,7 @@ func Run(task models.BuildTask) error {
 	}
 
 	// 3. 查找 uvprojx 文件
-	repoDir := filepath.Join(ReposBaseDir, task.RepoName)
+	repoDir := filepath.Join(reposBaseDir(o), task.RepoName)
 	uvprojxPath, err := findUvprojx(repoDir)
 	if err != nil {
 		return err
