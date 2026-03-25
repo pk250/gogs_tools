@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"net/http"
 	"time"
 
@@ -93,7 +93,7 @@ func sendWebhook(task models.BuildTask) error {
 // buildArtifactLinks returns download URLs for all artifacts of a task.
 func buildArtifactLinks(baseURL string, task models.BuildTask) []string {
 	dir := fmt.Sprintf("./data/artifacts/%d", task.Id)
-	entries, err := ioutil.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil
 	}

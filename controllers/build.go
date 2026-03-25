@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -80,7 +79,7 @@ func (this *BuildController) Detail() {
 	// list artifacts if present
 	artifactsDir := filepath.Join(".", "data", "artifacts", taskIdStr)
 	var artifacts []string
-	if entries, err := ioutil.ReadDir(artifactsDir); err == nil {
+	if entries, err := os.ReadDir(artifactsDir); err == nil {
 		for _, e := range entries {
 			if !e.IsDir() {
 				artifacts = append(artifacts, e.Name())

@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/smtp"
@@ -125,7 +124,7 @@ func sendBuildResult(task models.BuildTask) error {
 
 	if task.Status == models.TaskStatusSuccess {
 		artDir := filepath.Join(".", "data", "artifacts", fmt.Sprintf("%d", task.Id))
-		if entries, readErr := ioutil.ReadDir(artDir); readErr == nil {
+		if entries, readErr := os.ReadDir(artDir); readErr == nil {
 			for _, e := range entries {
 				if e.IsDir() {
 					continue
@@ -134,18 +133,18 @@ func sendBuildResult(task models.BuildTask) error {
 				if ext != ".hex" && ext != ".bin" {
 					continue
 				}
-				if e.Size() > maxAttachBytes {
+				if info, infoErr := e.Info(); infoErr == nil && info.Size() > maxAttachBytes {
 					body += fmt.Sprintf("\n产物 %s 超过 10MB，请前往详情页下载。", e.Name())
 					continue
 				}
-				if data, rErr := ioutil.ReadFile(filepath.Join(artDir, e.Name())); rErr == nil {
+				if data, rErr := os.ReadFile(filepath.Join(artDir, e.Name())); rErr == nil {
 					attachments = append(attachments, attachment{e.Name(), data})
 				}
 			}
 		}
 	} else if task.Status == models.TaskStatusFailed && task.LogPath != "" {
 		if fi, statErr := os.Stat(task.LogPath); statErr == nil && fi.Size() <= maxAttachBytes {
-			if data, rErr := ioutil.ReadFile(task.LogPath); rErr == nil {
+			if data, rErr := os.ReadFile(task.LogPath); rErr == nil {
 				attachments = append(attachments, attachment{filepath.Base(task.LogPath), data})
 			}
 		}
