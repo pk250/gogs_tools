@@ -247,3 +247,94 @@ func (this *AdminController) SaveSettings() {
 	this.Data["json"] = map[string]interface{}{"code": 0, "message": "ok"}
 	this.ServeJSON()
 }
+
+// TeamView GET /admin/team
+func (this *AdminController) TeamView() {
+	o := orm.NewOrm()
+
+	// all repo names from gogs push history
+	var repoRows []orm.Params
+	o.Raw("SELECT DISTINCT repository_name FROM gogs_d_b ORDER BY repository_name").Values(&repoRows)
+
+	// all repo configs
+	var configs []models.RepoConfig
+	o.QueryTable("repo_config").All(&configs)
+	configMap := make(map[string]models.RepoConfig)
+	for _, c := range configs {
+		configMap[c.RepoName] = c
+	}
+
+	// keil version names
+	var versions []models.KeilVersion
+	o.QueryTable("keil_version").All(&versions)
+	versionMap := make(map[int64]string)
+	for _, v := range versions {
+		versionMap[v.Id] = v.VersionName
+	}
+
+	type repoEntry struct {
+		RepoName  string
+		Config    models.RepoConfig
+		HasConfig bool
+		KeilName  string
+		Pushers   []string
+	}
+
+	filterMember := this.GetString("member")
+
+	var repoList []repoEntry
+	for _, r := range repoRows {
+		name, _ := r["repository_name"].(string)
+		if name == "" {
+			continue
+		}
+		var pusherRows []orm.Params
+		o.Raw("SELECT DISTINCT push_username FROM gogs_d_b WHERE repository_name=? ORDER BY push_username", name).Values(&pusherRows)
+		var pushers []string
+		for _, p := range pusherRows {
+			if u, ok := p["push_username"].(string); ok && u != "" {
+				pushers = append(pushers, u)
+			}
+		}
+		if filterMember != "" {
+			found := false
+			for _, u := range pushers {
+				if u == filterMember {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
+		}
+		cfg := configMap[name]
+		keilName := ""
+		if cfg.KeilVersionId > 0 {
+			keilName = versionMap[cfg.KeilVersionId]
+		}
+		repoList = append(repoList, repoEntry{
+			RepoName:  name,
+			Config:    cfg,
+			HasConfig: cfg.Id > 0,
+			KeilName:  keilName,
+			Pushers:   pushers,
+		})
+	}
+
+	var memberRows []orm.Params
+	o.Raw("SELECT DISTINCT push_username FROM gogs_d_b WHERE push_username != '' ORDER BY push_username").Values(&memberRows)
+	var memberList []string
+	for _, m := range memberRows {
+		if u, ok := m["push_username"].(string); ok && u != "" {
+			memberList = append(memberList, u)
+		}
+	}
+
+	this.Data["repoList"] = repoList
+	this.Data["memberList"] = memberList
+	this.Data["filterMember"] = filterMember
+	this.Data["menu"] = "admin"
+	this.Layout = "index.tpl"
+	this.TplName = "admin/team.tpl"
+}
