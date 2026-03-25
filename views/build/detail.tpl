@@ -27,11 +27,13 @@
               {{if eq .task.Status "pending"}}
               <div class="progress-bar" style="width:5%">待队列</div>
               {{else if eq .task.Status "running"}}
-              <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:20%">编译中</div>
+              <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:33%">编译中</div>
               {{else if eq .task.Status "failed"}}
-              <div class="progress-bar progress-bar-danger" style="width:20%">编译失败</div>
+              <div class="progress-bar progress-bar-danger" style="width:33%">编译失败</div>
               {{else if eq .task.Status "success"}}
-              <div class="progress-bar progress-bar-success" style="width:100%">完成</div>
+              <div class="progress-bar progress-bar-success" style="width:33%">编译</div>
+              <div class="progress-bar progress-bar-success" style="width:33%">质检</div>
+              <div class="progress-bar progress-bar-success" style="width:34%">通知</div>
               {{end}}
             </div>
             <small class="text-muted">

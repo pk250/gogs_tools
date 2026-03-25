@@ -97,6 +97,21 @@
         </form>
       </div>
     </div>
+
+    <div class="ibox">
+      <div class="ibox-title"><h5>代码质量 &mdash; PC-Lint</h5></div>
+      <div class="ibox-content">
+        <form id="pclint-form">
+          <div class="form-group">
+            <label>PC-Lint 可执行文件路径</label>
+            <input type="text" class="form-control" name="pclint_exe" value="{{index .cfg "pclint_exe"}}" placeholder="/usr/bin/lint-nt">
+            <p class="help-block">留空则不启用 PC-Lint 静态检查。</p>
+          </div>
+          <button type="submit" class="btn btn-primary">保存</button>
+          <span id="pclint-save-msg" style="margin-left:12px;display:none;"></span>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -168,6 +183,25 @@ document.getElementById('permission-form').addEventListener('submit', function(e
         .then(function(r){ return r.json(); })
         .then(function(res) {
             var msg = document.getElementById('perm-save-msg');
+            msg.style.display = 'inline';
+            if (res.code === 0) {
+                msg.className = 'text-success';
+                msg.textContent = '保存成功';
+            } else {
+                msg.className = 'text-danger';
+                msg.textContent = res.message;
+            }
+            setTimeout(function(){ msg.style.display='none'; }, 3000);
+        });
+});
+
+document.getElementById('pclint-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var data = new URLSearchParams(new FormData(this));
+    fetch('/admin/settings', {method:'POST', body: data})
+        .then(function(r){ return r.json(); })
+        .then(function(res) {
+            var msg = document.getElementById('pclint-save-msg');
             msg.style.display = 'inline';
             if (res.code === 0) {
                 msg.className = 'text-success';

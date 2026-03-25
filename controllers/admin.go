@@ -189,6 +189,7 @@ func (this *AdminController) Settings() {
 		models.ConfigKeyAIModel,
 		models.ConfigKeyAIPrompt,
 		models.ConfigKeyPermissionMode,
+		models.ConfigKeyPCLintExe,
 	}
 	kv := make(map[string]string)
 	for _, k := range keys {
@@ -219,6 +220,7 @@ func (this *AdminController) SaveSettings() {
 		models.ConfigKeyAIModel:            false,
 		models.ConfigKeyAIPrompt:           false,
 		models.ConfigKeyPermissionMode:     false,
+		models.ConfigKeyPCLintExe:           false,
 	}
 	for k, isSecret := range fields {
 		val := this.GetString(k)
