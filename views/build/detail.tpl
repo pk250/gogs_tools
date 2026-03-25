@@ -22,18 +22,25 @@
           <div class="col-lg-12">
             <div class="progress">
               {{if eq .task.Status "pending"}}
-              <div class="progress-bar" style="width:10%">待队列</div>
+              <div class="progress-bar" style="width:5%">待队列</div>
               {{else if eq .task.Status "running"}}
-              <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:50%">编译中</div>
+              <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:20%">编译中</div>
+              {{else if eq .task.Status "failed"}}
+              <div class="progress-bar progress-bar-danger" style="width:20%">编译失败</div>
               {{else if eq .task.Status "success"}}
               <div class="progress-bar progress-bar-success" style="width:100%">完成</div>
-              {{else if eq .task.Status "failed"}}
-              <div class="progress-bar progress-bar-danger" style="width:100%">失败</div>
               {{end}}
             </div>
             <small class="text-muted">
               阶段：
-              <span class="{{if or (eq .task.Status "running") (eq .task.Status "success") (eq .task.Status "failed")}}text-success{{end}}"><i class="fa fa-cog"></i> 编译</span>
+              {{$done := or (eq .task.Status "success") (eq .task.Status "failed")}}
+              <span class="{{if or (eq .task.Status "running") $done}}text-success{{end}}"><i class="fa fa-cog"></i> 编译</span>
+              &rarr;
+              <span class="{{if and $done .hasLint}}{{if eq .lintResult.Status "fail"}}text-danger{{else}}text-success{{end}}{{end}}"><i class="fa fa-search"></i> PC-Lint</span>
+              &rarr;
+              <span class="{{if and $done .hasAI}}{{if eq .aiResult.Status "fail"}}text-danger{{else}}text-success{{end}}{{end}}"><i class="fa fa-magic"></i> AI审查</span>
+              &rarr;
+              <span class="{{if and $done .hasGitCheck}}{{if eq .gitCheckResult.Status "fail"}}text-danger{{else}}text-success{{end}}{{end}}"><i class="fa fa-check-circle"></i> Git规范</span>
               &rarr;
               <span class="{{if eq .task.Status "success"}}text-success{{end}}"><i class="fa fa-envelope"></i> 通知</span>
             </small>
@@ -66,15 +73,16 @@
 
     {{if .hasLint}}
     <div class="ibox">
-      <div class="ibox-title">
-        <h5>Lint 检查结果
+      <div class="ibox-title" style="cursor:pointer;" onclick="togglePanel('lint-body', this)">
+        <h5>PC-Lint 检查结果
           {{if eq .lintResult.Status "pass"}}<span class="label label-success">通过</span>{{end}}
           {{if eq .lintResult.Status "warn"}}<span class="label label-warning">警告</span>{{end}}
           {{if eq .lintResult.Status "fail"}}<span class="label label-danger">失败</span>{{end}}
           {{if eq .lintResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
         </h5>
+        <div class="ibox-tools"><i class="fa fa-chevron-{{if or (eq .lintResult.Status "fail") (eq .lintResult.Status "warn")}}up{{else}}down{{end}}" id="lint-icon"></i></div>
       </div>
-      <div class="ibox-content">
+      <div class="ibox-content" id="lint-body" style="{{if and (ne .lintResult.Status "fail") (ne .lintResult.Status "warn")}}display:none;{{end}}">
         <p>{{.lintResult.Summary}}</p>
         {{if .lintResult.Detail}}
         <pre style="max-height:300px;overflow-y:auto;background:#1a1a2e;color:#e0e0e0;padding:12px;">{{.lintResult.Detail}}</pre>
@@ -85,14 +93,15 @@
 
     {{if .hasGitCheck}}
     <div class="ibox">
-      <div class="ibox-title">
+      <div class="ibox-title" style="cursor:pointer;" onclick="togglePanel('git-body', this)">
         <h5>Git 提交规范
           {{if eq .gitCheckResult.Status "pass"}}<span class="label label-success">合规</span>{{end}}
           {{if eq .gitCheckResult.Status "fail"}}<span class="label label-danger">不合规</span>{{end}}
           {{if eq .gitCheckResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
         </h5>
+        <div class="ibox-tools"><i class="fa fa-chevron-{{if eq .gitCheckResult.Status "fail"}}up{{else}}down{{end}}" id="git-icon"></i></div>
       </div>
-      <div class="ibox-content">
+      <div class="ibox-content" id="git-body" style="{{if ne .gitCheckResult.Status "fail"}}display:none;{{end}}">
         <p>{{.gitCheckResult.Summary}}</p>
       </div>
     </div>
@@ -100,14 +109,15 @@
 
     {{if .hasAI}}
     <div class="ibox">
-      <div class="ibox-title">
+      <div class="ibox-title" style="cursor:pointer;" onclick="togglePanel('ai-body', this)">
         <h5>AI 代码审查
           {{if eq .aiResult.Status "pass"}}<span class="label label-success">完成</span>{{end}}
           {{if eq .aiResult.Status "fail"}}<span class="label label-danger">失败</span>{{end}}
           {{if eq .aiResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
         </h5>
+        <div class="ibox-tools"><i class="fa fa-chevron-{{if eq .aiResult.Status "fail"}}up{{else}}down{{end}}" id="ai-icon"></i></div>
       </div>
-      <div class="ibox-content">
+      <div class="ibox-content" id="ai-body" style="{{if ne .aiResult.Status "fail"}}display:none;{{end}}">
         <p>{{.aiResult.Summary}}</p>
         {{if .aiResult.Detail}}
         <pre style="max-height:400px;overflow-y:auto;background:#f8f9fa;color:#333;padding:12px;white-space:pre-wrap;">{{.aiResult.Detail}}</pre>
@@ -124,6 +134,19 @@
         <strong>Copyright</strong> Dakewe &copy; 2023-2033
     </div>
 </div>
+<script>
+function togglePanel(bodyId, titleEl) {
+    var body = document.getElementById(bodyId);
+    var icon = titleEl.querySelector('i[id$="-icon"]');
+    if (body.style.display === 'none') {
+        body.style.display = '';
+        if (icon) { icon.className = icon.className.replace('fa-chevron-down', 'fa-chevron-up'); }
+    } else {
+        body.style.display = 'none';
+        if (icon) { icon.className = icon.className.replace('fa-chevron-up', 'fa-chevron-down'); }
+    }
+}
+</script>
 <script>
 (function() {
     var taskId = {{.task.Id}};

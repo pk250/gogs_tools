@@ -73,6 +73,36 @@ func (this *DashboardController) Index() {
 	this.Data["todaySuccess"] = todaySuccess
 	this.Data["todayFailed"] = todayFailed
 	this.Data["todayRunning"] = todayRunning
+
+	// build review status summary per task
+	type reviewSummary struct {
+		Label string
+		Class string
+	}
+	taskReviewStatus := make(map[int64]reviewSummary)
+	for _, t := range tasks {
+		var results []models.ReviewResult
+		o.QueryTable("review_result").Filter("TaskId", t.Id).All(&results)
+		if len(results) == 0 {
+			continue
+		}
+		hasFail, hasWarn := false, false
+		for _, r := range results {
+			if r.Status == models.ReviewStatusFail {
+				hasFail = true
+			} else if r.Status == models.ReviewStatusWarn {
+				hasWarn = true
+			}
+		}
+		if hasFail {
+			taskReviewStatus[t.Id] = reviewSummary{Label: "有错误", Class: "danger"}
+		} else if hasWarn {
+			taskReviewStatus[t.Id] = reviewSummary{Label: "有警告", Class: "warning"}
+		} else {
+			taskReviewStatus[t.Id] = reviewSummary{Label: "通过", Class: "success"}
+		}
+	}
+	this.Data["taskReviewStatus"] = taskReviewStatus
 	this.Data["menu"] = "dashboard"
 	this.Layout = "index.tpl"
 	this.TplName = "dashboard/index.tpl"

@@ -68,6 +68,7 @@
               <th>提交人</th>
               <th>Commit</th>
               <th>状态</th>
+              <th>审查状态</th>
               <th>时间</th>
               <th>操作</th>
             </tr>
@@ -91,6 +92,14 @@
                   <span class="label label-success">成功</span>
                 {{else if eq .Status "failed"}}
                   <span class="label label-danger">失败</span>
+                {{end}}
+              </td>
+              <td>
+                {{$rs := index $.taskReviewStatus .Id}}
+                {{if $rs.Label}}
+                  <span class="label label-{{$rs.Class}}">{{$rs.Label}}</span>
+                {{else}}
+                  <span class="label label-default">-</span>
                 {{end}}
               </td>
               <td>
