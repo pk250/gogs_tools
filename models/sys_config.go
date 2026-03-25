@@ -28,4 +28,5 @@ const (
 	ConfigKeyPCLintExe         = "pclint_exe"          // PC-Lint 可执行文件完整路径
 	ConfigKeyLintTplPath       = "lint_tpl_path"       // 默认 .lnt 模板文件路径
 	ConfigKeyCommitMsgPattern  = "commit_msg_pattern"  // commit message 正则规范
+	ConfigKeyPermissionMode    = "permission_mode"      // loose | strict
 )

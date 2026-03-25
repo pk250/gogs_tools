@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gogs_tools/middleware"
 	"gogs_tools/models"
 
 	"github.com/astaxie/beego/orm"
@@ -58,9 +59,11 @@ func (this *RepoController) Config() {
 	var versions []models.KeilVersion
 	o.QueryTable("keil_version").All(&versions)
 
+	user := this.Ctx.Input.Session("UserData").(models.Users)
 	this.Data["config"] = config
 	this.Data["versions"] = versions
 	this.Data["repoName"] = repoName
+	this.Data["canEdit"] = middleware.CanEditRepoConfig(user)
 	this.Data["menu"] = "repos"
 	this.Layout = "index.tpl"
 	this.TplName = "repo/config.tpl"
@@ -68,6 +71,13 @@ func (this *RepoController) Config() {
 
 // SaveConfig POST /repos/:repoName/config
 func (this *RepoController) SaveConfig() {
+	user := this.Ctx.Input.Session("UserData").(models.Users)
+	if !middleware.CanEditRepoConfig(user) {
+		this.Ctx.ResponseWriter.WriteHeader(403)
+		this.Data["json"] = map[string]interface{}{"code": 403, "message": "权限不足：当前为严格模式，仅管理员或项目负责人可修改配置"}
+		this.ServeJSON()
+		return
+	}
 	repoName := this.Ctx.Input.Param(":repoName")
 	o := orm.NewOrm()
 

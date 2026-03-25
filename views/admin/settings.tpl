@@ -79,6 +79,24 @@
         </form>
       </div>
     </div>
+
+    <div class="ibox">
+      <div class="ibox-title"><h5>系统管理 &mdash; 权限模式</h5></div>
+      <div class="ibox-content">
+        <form id="permission-form">
+          <div class="form-group">
+            <label>仓库配置权限模式</label>
+            <select class="form-control" name="permission_mode">
+              <option value="loose" {{if ne (index .cfg "permission_mode") "strict"}}selected{{end}}>宽松模式（所有用户可配置仓库）</option>
+              <option value="strict" {{if eq (index .cfg "permission_mode") "strict"}}selected{{end}}>严格模式（仅管理员/项目负责人可配置）</option>
+            </select>
+            <p class="help-block">切换后即时生效，无需重启。</p>
+          </div>
+          <button type="submit" class="btn btn-primary">保存</button>
+          <span id="perm-save-msg" style="margin-left:12px;display:none;"></span>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -131,6 +149,25 @@ document.getElementById('ai-form').addEventListener('submit', function(e) {
         .then(function(r){ return r.json(); })
         .then(function(res) {
             var msg = document.getElementById('ai-save-msg');
+            msg.style.display = 'inline';
+            if (res.code === 0) {
+                msg.className = 'text-success';
+                msg.textContent = '保存成功';
+            } else {
+                msg.className = 'text-danger';
+                msg.textContent = res.message;
+            }
+            setTimeout(function(){ msg.style.display='none'; }, 3000);
+        });
+});
+
+document.getElementById('permission-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var data = new URLSearchParams(new FormData(this));
+    fetch('/admin/settings', {method:'POST', body: data})
+        .then(function(r){ return r.json(); })
+        .then(function(res) {
+            var msg = document.getElementById('perm-save-msg');
             msg.style.display = 'inline';
             if (res.code === 0) {
                 msg.className = 'text-success';

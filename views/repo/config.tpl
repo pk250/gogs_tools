@@ -6,6 +6,9 @@
         <h5>仓库配置 - {{.repoName}}</h5>
       </div>
       <div class="ibox-content">
+        {{if not .canEdit}}
+        <div class="alert alert-warning"><i class="fa fa-lock"></i> 当前为<strong>严格模式</strong>，仅管理员或项目负责人可修改仓库配置。</div>
+        {{end}}
         <form id="configForm">
           <div class="form-group">
             <label>Keil 版本</label>
@@ -48,7 +51,7 @@
             <input type="text" name="webhook_url" class="form-control" value="{{.config.WebhookUrl}}" placeholder="https://your-server/callback">
           </div>
           <div class="form-group">
-            <button type="button" class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+            <button type="button" class="btn btn-primary" onclick="saveConfig()" {{if not .canEdit}}disabled{{end}}>保存配置</button>
             <a href="/repos" class="btn btn-default">返回列表</a>
           </div>
         </form>
