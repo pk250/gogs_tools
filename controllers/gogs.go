@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"gogs_tools/models"
+	"gogs_tools/services"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -48,6 +50,14 @@ func (this *GogsControllers) Post() {
 			if err != nil {
 				info = append(info, "datainfo insert fail:"+commit.Id)
 				fmt.Print(err)
+			} else {
+				// 判断触发模式，自动模式则入队
+				repoConfig := models.RepoConfig{RepoName: gogs.Repository.Name}
+				if err2 := o.Read(&repoConfig, "RepoName"); err2 == nil && repoConfig.TriggerMode == "auto" {
+					if _, enqErr := services.Enqueue(gogs.Repository.Name, commit.Id, commit.Message, commit.Author.Name); enqErr != nil {
+						logs.Warn("[Gogs] Enqueue failed repo=%s commit=%s err=%v", gogs.Repository.Name, commit.Id, enqErr)
+					}
+				}
 			}
 		}
 

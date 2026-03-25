@@ -1,0 +1,157 @@
+<div class="wrapper wrapper-content">
+<div class="row">
+  <div class="col-lg-12">
+    <div id="ws-alert" class="alert alert-warning" style="display:none;">
+      连接已断开，正在重连...
+    </div>
+
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>任务 #{{.task.Id}} &mdash; {{.task.RepoName}}</h5>
+        <span id="task-status" class="label label-{{.statusClass}}">{{.task.Status}}</span>
+        {{if and (eq .triggerMode "manual") (eq .task.Status "pending")}}
+        <button id="btn-trigger" class="btn btn-xs btn-primary m-l-sm" onclick="triggerBuild()">触发编译</button>
+        {{end}}
+      </div>
+      <div class="ibox-content">
+        <p>Commit: <code>{{if ge (len .task.CommitHash) 7}}{{slice .task.CommitHash 0 7}}{{else}}{{.task.CommitHash}}{{end}}</code> &nbsp; 提交人: {{.task.Author}}</p>
+        <p>{{.task.CommitMsg}}</p>
+
+        <!-- Phase progress bar -->
+        <div class="row m-t-sm">
+          <div class="col-lg-12">
+            <div class="progress">
+              {{if eq .task.Status "pending"}}
+              <div class="progress-bar" style="width:10%">待队列</div>
+              {{else if eq .task.Status "running"}}
+              <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width:50%">编译中</div>
+              {{else if eq .task.Status "success"}}
+              <div class="progress-bar progress-bar-success" style="width:100%">完成</div>
+              {{else if eq .task.Status "failed"}}
+              <div class="progress-bar progress-bar-danger" style="width:100%">失败</div>
+              {{end}}
+            </div>
+            <small class="text-muted">
+              阶段：
+              <span class="{{if or (eq .task.Status "running") (eq .task.Status "success") (eq .task.Status "failed")}}text-success{{end}}"><i class="fa fa-cog"></i> 编译</span>
+              &rarr;
+              <span class="{{if eq .task.Status "success"}}text-success{{end}}"><i class="fa fa-envelope"></i> 通知</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ibox">
+      <div class="ibox-title"><h5>编译日志</h5></div>
+      <div class="ibox-content">
+        <pre id="log-box" style="height:500px;overflow-y:auto;background:#1a1a2e;color:#e0e0e0;padding:12px;"></pre>
+      </div>
+    </div>
+
+    {{if .artifacts}}
+    <div class="ibox">
+      <div class="ibox-title"><h5>编译产物</h5></div>
+      <div class="ibox-content">
+        <ul class="list-group">
+          {{range .artifacts}}
+          <li class="list-group-item">
+            <a href="/build/artifacts/{{$.task.Id}}/{{.}}"><i class="fa fa-download"></i> {{.}}</a>
+          </li>
+          {{end}}
+        </ul>
+      </div>
+    </div>
+    {{end}}
+
+  </div>
+</div>
+</div>
+<div class="footer">
+    <div>
+        <strong>Copyright</strong> Dakewe &copy; 2023-2033
+    </div>
+</div>
+<script>
+(function() {
+    var taskId = {{.task.Id}};
+    var logBox = document.getElementById('log-box');
+    var wsAlert = document.getElementById('ws-alert');
+    var ws;
+    var autoScroll = true;
+    var reconnectTimer;
+
+    logBox.addEventListener('scroll', function() {
+        var atBottom = logBox.scrollHeight - logBox.scrollTop <= logBox.clientHeight + 20;
+        autoScroll = atBottom;
+    });
+
+    function appendLine(text) {
+        logBox.textContent += text + '\n';
+        if (autoScroll) {
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+    }
+
+    function connect() {
+        var proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        ws = new WebSocket(proto + '://' + location.host + '/ws/build/' + taskId);
+
+        ws.onopen = function() {
+            wsAlert.style.display = 'none';
+            clearTimeout(reconnectTimer);
+        };
+
+        ws.onmessage = function(e) {
+            var msg = JSON.parse(e.data);
+            if (msg.type === 'log') {
+                appendLine(msg.data);
+            } else if (msg.type === 'status') {
+                var el = document.getElementById('task-status');
+                if (el) el.textContent = msg.data;
+            } else if (msg.type === 'complete') {
+                appendLine('[编译完成：' + msg.data + ']');
+                autoScroll = false;
+                ws.close();
+                setTimeout(function(){ location.reload(); }, 1500);
+            } else if (msg.type === 'error') {
+                appendLine('[错误：' + msg.data + ']');
+            }
+        };
+
+        ws.onerror = function() {
+            wsAlert.style.display = 'block';
+        };
+
+        ws.onclose = function() {
+            wsAlert.style.display = 'block';
+            reconnectTimer = setTimeout(connect, 3000);
+        };
+    }
+
+    connect();
+})();
+
+function triggerBuild() {
+    var btn = document.getElementById('btn-trigger');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = '触发中...';
+    fetch('/api/build/{{.task.Id}}/enqueue', {method: 'POST'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if (d.code === 0) {
+                btn.textContent = '已触发';
+                setTimeout(function(){ location.reload(); }, 800);
+            } else {
+                btn.textContent = '触发失败';
+                btn.disabled = false;
+                alert(d.message);
+            }
+        })
+        .catch(function(){
+            btn.textContent = '触发失败';
+            btn.disabled = false;
+        });
+}
+</script>

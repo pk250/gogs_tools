@@ -26,10 +26,13 @@ func init() {
 	orm.RegisterDataBase("default", "mysql", beego.AppConfig.String("sqlconn"))
 
 	orm.RegisterModel(new(Datainfos))
-
 	orm.RegisterModel(new(Users))
-
 	orm.RegisterModel(new(GogsDB))
+	orm.RegisterModel(new(KeilVersion))
+	orm.RegisterModel(new(RepoConfig))
+	orm.RegisterModel(new(BuildTask))
+	orm.RegisterModel(new(ReviewResult))
+	orm.RegisterModel(new(SysConfig))
 
 	orm.RunSyncdb("default", false, true)
 }
