@@ -12,6 +12,9 @@
         {{if and (eq .triggerMode "manual") (eq .task.Status "pending")}}
         <button id="btn-trigger" class="btn btn-xs btn-primary m-l-sm" onclick="triggerBuild()">触发编译</button>
         {{end}}
+        {{if and .hasWebhook (or (eq .task.Status "success") (eq .task.Status "failed"))}}
+        <button class="btn btn-xs btn-default m-l-sm" onclick="retryWebhook()">重试 Webhook</button>
+        {{end}}
       </div>
       <div class="ibox-content">
         <p>Commit: <code>{{if ge (len .task.CommitHash) 7}}{{slice .task.CommitHash 0 7}}{{else}}{{.task.CommitHash}}{{end}}</code> &nbsp; 提交人: {{.task.Author}}</p>
@@ -228,5 +231,14 @@ function triggerBuild() {
             btn.textContent = '触发失败';
             btn.disabled = false;
         });
+}
+
+function retryWebhook() {
+    fetch('/api/build/{{.task.Id}}/webhook-retry', {method: 'POST'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            alert(d.code === 0 ? 'Webhook 回调已触发' : d.message);
+        })
+        .catch(function(){ alert('请求失败'); });
 }
 </script>

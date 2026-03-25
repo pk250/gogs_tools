@@ -31,6 +31,7 @@ func init() {
 	// Build 路由
 	beego.Router("/api/build/trigger", &controllers.BuildController{}, "post:Trigger")
 	beego.Router("/api/build/:taskId/enqueue", &controllers.BuildController{}, "post:EnqueueTask")
+	beego.Router("/api/build/:taskId/webhook-retry", &controllers.BuildController{}, "post:WebhookRetry")
 
 	// Build 详情页
 	beego.Router("/build/detail/:taskId", &controllers.BuildController{}, "get:Detail")

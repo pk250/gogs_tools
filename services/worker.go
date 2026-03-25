@@ -64,5 +64,6 @@ func runWorker(task models.BuildTask) {
 	updated := models.BuildTask{Id: task.Id}
 	if err2 := o.Read(&updated); err2 == nil {
 		go notifier.SendBuildResult(updated)
+		go notifier.SendWebhook(updated)
 	}
 }

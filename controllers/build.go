@@ -9,6 +9,7 @@ import (
 
 	"gogs_tools/models"
 	"gogs_tools/services"
+	"gogs_tools/services/notifier"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -111,6 +112,7 @@ func (this *BuildController) Detail() {
 	this.Data["task"] = task
 	this.Data["statusClass"] = statusClass
 	this.Data["triggerMode"] = cfg.TriggerMode
+	this.Data["hasWebhook"] = cfg.WebhookEnabled && cfg.WebhookUrl != ""
 	this.Data["artifacts"] = artifacts
 	this.Data["lintResult"] = lintResult
 	this.Data["hasLint"] = hasLint
@@ -169,4 +171,26 @@ func (this *BuildController) ArtifactDownload() {
 		return
 	}
 	this.Ctx.Output.Download(path, filename)
+}
+
+// WebhookRetry POST /api/build/:taskId/webhook-retry
+func (this *BuildController) WebhookRetry() {
+	taskIdStr := this.Ctx.Input.Param(":taskId")
+	taskId, err := strconv.ParseInt(taskIdStr, 10, 64)
+	if err != nil || taskId <= 0 {
+		this.Data["json"] = map[string]interface{}{"code": 400, "message": "无效 taskId"}
+		this.ServeJSON()
+		return
+	}
+	o := orm.NewOrm()
+	task := models.BuildTask{Id: taskId}
+	if err := o.Read(&task); err != nil {
+		this.Ctx.ResponseWriter.WriteHeader(404)
+		this.Data["json"] = map[string]interface{}{"code": 404, "message": "任务不存在"}
+		this.ServeJSON()
+		return
+	}
+	go notifier.SendWebhook(task)
+	this.Data["json"] = map[string]interface{}{"code": 0, "message": "webhook 回调已触发"}
+	this.ServeJSON()
 }
