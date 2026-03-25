@@ -56,6 +56,7 @@ func runWorker(task models.BuildTask) {
 		UpdateStatus(task.Id, models.TaskStatusSuccess)
 		go RunLint(task)
 		go RunGitCheck(task)
+		go RunAIReview(task)
 	}
 
 	// reload task to get FinishedAt/LogPath populated

@@ -101,6 +101,13 @@ func (this *BuildController) Detail() {
 		Filter("ReviewType", models.ReviewTypeGitMsg).
 		One(&gitCheckResult) == nil
 
+	// fetch AI review result if present
+	var aiResult models.ReviewResult
+	hasAI := o.QueryTable("review_result").
+		Filter("TaskId", taskId).
+		Filter("ReviewType", models.ReviewTypeAI).
+		One(&aiResult) == nil
+
 	this.Data["task"] = task
 	this.Data["statusClass"] = statusClass
 	this.Data["triggerMode"] = cfg.TriggerMode
@@ -109,6 +116,8 @@ func (this *BuildController) Detail() {
 	this.Data["hasLint"] = hasLint
 	this.Data["gitCheckResult"] = gitCheckResult
 	this.Data["hasGitCheck"] = hasGitCheck
+	this.Data["aiResult"] = aiResult
+	this.Data["hasAI"] = hasAI
 	this.Data["menu"] = "dashboard"
 	this.Layout = "index.tpl"
 	this.TplName = "build/detail.tpl"

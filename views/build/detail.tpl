@@ -98,6 +98,24 @@
     </div>
     {{end}}
 
+    {{if .hasAI}}
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>AI 代码审查
+          {{if eq .aiResult.Status "pass"}}<span class="label label-success">完成</span>{{end}}
+          {{if eq .aiResult.Status "fail"}}<span class="label label-danger">失败</span>{{end}}
+          {{if eq .aiResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
+        </h5>
+      </div>
+      <div class="ibox-content">
+        <p>{{.aiResult.Summary}}</p>
+        {{if .aiResult.Detail}}
+        <pre style="max-height:400px;overflow-y:auto;background:#f8f9fa;color:#333;padding:12px;white-space:pre-wrap;">{{.aiResult.Detail}}</pre>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
   </div>
 </div>
 </div>

@@ -17,6 +17,7 @@ const (
 	ConfigKeyAIProvider   = "ai_provider"    // claude | openai
 	ConfigKeyAIApiKey     = "ai_api_key"     // 加密存储
 	ConfigKeyAIModel      = "ai_model"       // 模型名称
+	ConfigKeyAIPrompt     = "ai_prompt"      // 审查提示词
 	ConfigKeySMTPHost     = "smtp_host"
 	ConfigKeySMTPPort     = "smtp_port"
 	ConfigKeySMTPUser     = "smtp_user"

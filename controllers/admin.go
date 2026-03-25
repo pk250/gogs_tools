@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"gogs_tools/models"
+	aiPkg "gogs_tools/services/ai"
 	"os"
 	"strconv"
 
@@ -184,6 +185,9 @@ func (this *AdminController) Settings() {
 		models.ConfigKeySMTPFrom,
 		models.ConfigKeyAppBaseURL,
 		models.ConfigKeyCommitMsgPattern,
+		models.ConfigKeyAIProvider,
+		models.ConfigKeyAIModel,
+		models.ConfigKeyAIPrompt,
 	}
 	kv := make(map[string]string)
 	for _, k := range keys {
@@ -209,11 +213,22 @@ func (this *AdminController) SaveSettings() {
 		models.ConfigKeySMTPFrom:           false,
 		models.ConfigKeyAppBaseURL:         false,
 		models.ConfigKeyCommitMsgPattern:   false,
+		models.ConfigKeyAIProvider:         false,
+		models.ConfigKeyAIApiKey:           true,
+		models.ConfigKeyAIModel:            false,
+		models.ConfigKeyAIPrompt:           false,
 	}
 	for k, isSecret := range fields {
 		val := this.GetString(k)
 		if val == "" {
 			continue
+		}
+		// AI API Key 保存前加密
+		if k == models.ConfigKeyAIApiKey {
+			encrypted, err := aiPkg.Encrypt(val)
+			if err == nil {
+				val = encrypted
+			}
 		}
 		var c models.SysConfig
 		err := o.QueryTable("sys_config").Filter("ConfigKey", k).One(&c)
