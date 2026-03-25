@@ -94,12 +94,21 @@ func (this *BuildController) Detail() {
 		Filter("ReviewType", models.ReviewTypeLint).
 		One(&lintResult) == nil
 
+	// fetch git check result if present
+	var gitCheckResult models.ReviewResult
+	hasGitCheck := o.QueryTable("review_result").
+		Filter("TaskId", taskId).
+		Filter("ReviewType", models.ReviewTypeGitMsg).
+		One(&gitCheckResult) == nil
+
 	this.Data["task"] = task
 	this.Data["statusClass"] = statusClass
 	this.Data["triggerMode"] = cfg.TriggerMode
 	this.Data["artifacts"] = artifacts
 	this.Data["lintResult"] = lintResult
 	this.Data["hasLint"] = hasLint
+	this.Data["gitCheckResult"] = gitCheckResult
+	this.Data["hasGitCheck"] = hasGitCheck
 	this.Data["menu"] = "dashboard"
 	this.Layout = "index.tpl"
 	this.TplName = "build/detail.tpl"

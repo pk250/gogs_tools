@@ -83,6 +83,21 @@
     </div>
     {{end}}
 
+    {{if .hasGitCheck}}
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>Git 提交规范
+          {{if eq .gitCheckResult.Status "pass"}}<span class="label label-success">合规</span>{{end}}
+          {{if eq .gitCheckResult.Status "fail"}}<span class="label label-danger">不合规</span>{{end}}
+          {{if eq .gitCheckResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
+        </h5>
+      </div>
+      <div class="ibox-content">
+        <p>{{.gitCheckResult.Summary}}</p>
+      </div>
+    </div>
+    {{end}}
+
   </div>
 </div>
 </div>

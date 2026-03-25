@@ -183,6 +183,7 @@ func (this *AdminController) Settings() {
 		models.ConfigKeySMTPPass,
 		models.ConfigKeySMTPFrom,
 		models.ConfigKeyAppBaseURL,
+		models.ConfigKeyCommitMsgPattern,
 	}
 	kv := make(map[string]string)
 	for _, k := range keys {
@@ -201,12 +202,13 @@ func (this *AdminController) Settings() {
 func (this *AdminController) SaveSettings() {
 	o := orm.NewOrm()
 	fields := map[string]bool{
-		models.ConfigKeySMTPHost:    false,
-		models.ConfigKeySMTPPort:    false,
-		models.ConfigKeySMTPUser:    false,
-		models.ConfigKeySMTPPass:    true,
-		models.ConfigKeySMTPFrom:    false,
-		models.ConfigKeyAppBaseURL:  false,
+		models.ConfigKeySMTPHost:           false,
+		models.ConfigKeySMTPPort:           false,
+		models.ConfigKeySMTPUser:           false,
+		models.ConfigKeySMTPPass:           true,
+		models.ConfigKeySMTPFrom:           false,
+		models.ConfigKeyAppBaseURL:         false,
+		models.ConfigKeyCommitMsgPattern:   false,
 	}
 	for k, isSecret := range fields {
 		val := this.GetString(k)
