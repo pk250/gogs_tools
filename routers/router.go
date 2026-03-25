@@ -27,6 +27,8 @@ func init() {
 	// Repo 路由
 	beego.Router("/repos", &controllers.RepoController{}, "get:List")
 	beego.Router("/repos/:repoName/config", &controllers.RepoController{}, "get:Config;post:SaveConfig")
+	beego.Router("/repos/:repoName/lint-config", &controllers.RepoController{}, "post:UploadLintConfig;delete:DeleteLintConfig")
+	beego.Router("/repos/:repoName/lint-template", &controllers.RepoController{}, "get:LintTemplate")
 
 	// Build 路由
 	beego.Router("/api/build/trigger", &controllers.BuildController{}, "post:Trigger")
