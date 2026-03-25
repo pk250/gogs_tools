@@ -104,6 +104,6 @@ func (this *DashboardController) Index() {
 	}
 	this.Data["taskReviewStatus"] = taskReviewStatus
 	this.Data["menu"] = "dashboard"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "dashboard/index.tpl"
 }

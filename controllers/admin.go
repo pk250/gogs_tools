@@ -65,7 +65,7 @@ func (this *AdminController) KeilVersionList() {
 	this.Data["prevPage"] = pageNum - 1
 	this.Data["nextPage"] = pageNum + 1
 	this.Data["menu"] = "admin"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "admin/keil_versions.tpl"
 }
 
@@ -199,7 +199,7 @@ func (this *AdminController) Settings() {
 	}
 	this.Data["cfg"] = kv
 	this.Data["menu"] = "admin"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "admin/settings.tpl"
 }
 
@@ -335,6 +335,6 @@ func (this *AdminController) TeamView() {
 	this.Data["memberList"] = memberList
 	this.Data["filterMember"] = filterMember
 	this.Data["menu"] = "admin"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "admin/team.tpl"
 }

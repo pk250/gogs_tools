@@ -75,18 +75,6 @@
                     <li class="{{if eq .menu "repos"}}active{{end}}">
                         <a href="/repos"><i class="fa fa-code-fork fa-fw"></i> <span class="nav-label">仓库配置</span></a>
                     </li>
-                    <li class="{{if eq "compile" .menu}}active{{end}}">
-                        <a href="/layout/compile"><i class="fa fa-align-justify"></i> <span class="nav-label">编译管理</span></a>
-                    </li>
-                    <li class="{{if eq "knowledge" .menu}}active{{end}}">
-                        <a href="/layout/knowledge"><i class="fa fa-book"></i> <span class="nav-label">知识论坛</span></a>
-                    </li>
-                    <li class="{{if eq "messages" .menu}}active{{end}}">
-                        <a href="/layout/messages"><i class="fa fa-weixin"></i> <span class="nav-label">消息管理</span></a>
-                    </li>
-                    <li class="{{if eq "account" .menu}}active{{end}}">
-                        <a href="/layout/account"><i class="fa fa-cogs"></i> <span class="nav-label">账号管理</span></a>
-                    </li>
                     {{if eq .role "管理员"}}
                     <li class="{{if eq .menu "admin"}}active{{end}}">
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> <span class="nav-label">系统管理</span> <span class="fa arrow"></span></a>

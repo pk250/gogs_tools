@@ -120,7 +120,7 @@ func (this *BuildController) Detail() {
 	this.Data["aiResult"] = aiResult
 	this.Data["hasAI"] = hasAI
 	this.Data["menu"] = "dashboard"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "build/detail.tpl"
 }
 

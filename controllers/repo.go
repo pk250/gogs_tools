@@ -44,7 +44,7 @@ func (this *RepoController) List() {
 	this.Data["configMap"] = configMap
 	this.Data["versionMap"] = versionMap
 	this.Data["menu"] = "repos"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "repo/list.tpl"
 }
 
@@ -92,7 +92,7 @@ func (this *RepoController) Config() {
 	this.Data["lintUploadedAt"] = lintUploadedAt
 	this.Data["lintTplURL"] = lintTplURL
 	this.Data["menu"] = "repos"
-	this.Layout = "index.tpl"
+	this.Layout = "index.html"
 	this.TplName = "repo/config.tpl"
 }
 
