@@ -172,3 +172,59 @@ func (this *AdminController) KeilVersionValidatePath() {
 	}
 	this.ServeJSON()
 }
+
+// Settings GET /admin/settings
+func (this *AdminController) Settings() {
+	o := orm.NewOrm()
+	keys := []string{
+		models.ConfigKeySMTPHost,
+		models.ConfigKeySMTPPort,
+		models.ConfigKeySMTPUser,
+		models.ConfigKeySMTPPass,
+		models.ConfigKeySMTPFrom,
+		models.ConfigKeyAppBaseURL,
+	}
+	kv := make(map[string]string)
+	for _, k := range keys {
+		var c models.SysConfig
+		if err := o.QueryTable("sys_config").Filter("ConfigKey", k).One(&c); err == nil {
+			kv[k] = c.ConfigVal
+		}
+	}
+	this.Data["cfg"] = kv
+	this.Data["menu"] = "admin"
+	this.Layout = "index.tpl"
+	this.TplName = "admin/settings.tpl"
+}
+
+// SaveSettings POST /admin/settings
+func (this *AdminController) SaveSettings() {
+	o := orm.NewOrm()
+	fields := map[string]bool{
+		models.ConfigKeySMTPHost:    false,
+		models.ConfigKeySMTPPort:    false,
+		models.ConfigKeySMTPUser:    false,
+		models.ConfigKeySMTPPass:    true,
+		models.ConfigKeySMTPFrom:    false,
+		models.ConfigKeyAppBaseURL:  false,
+	}
+	for k, isSecret := range fields {
+		val := this.GetString(k)
+		if val == "" {
+			continue
+		}
+		var c models.SysConfig
+		err := o.QueryTable("sys_config").Filter("ConfigKey", k).One(&c)
+		if err != nil {
+			c = models.SysConfig{ConfigKey: k, IsSecret: isSecret}
+		}
+		c.ConfigVal = val
+		if c.Id == 0 {
+			o.Insert(&c)
+		} else {
+			o.Update(&c, "ConfigVal", "UpdatedAt")
+		}
+	}
+	this.Data["json"] = map[string]interface{}{"code": 0, "message": "ok"}
+	this.ServeJSON()
+}

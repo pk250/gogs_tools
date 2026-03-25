@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"gogs_tools/models"
+	"gogs_tools/services/notifier"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -53,5 +54,12 @@ func runWorker(task models.BuildTask) {
 		UpdateStatus(task.Id, models.TaskStatusFailed)
 	} else {
 		UpdateStatus(task.Id, models.TaskStatusSuccess)
+	}
+
+	// reload task to get FinishedAt/LogPath populated
+	o := orm.NewOrm()
+	updated := models.BuildTask{Id: task.Id}
+	if err2 := o.Read(&updated); err2 == nil {
+		go notifier.SendBuildResult(updated)
 	}
 }

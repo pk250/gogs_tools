@@ -21,6 +21,7 @@ func init() {
 	beego.Router("/admin/keil-versions", &controllers.AdminController{}, "get:KeilVersionList;post:KeilVersionCreate")
 	beego.Router("/admin/keil-versions/:page", &controllers.AdminController{}, "get:KeilVersionList")
 	beego.Router("/admin/keil-versions/:id", &controllers.AdminController{}, "put:KeilVersionUpdate;delete:KeilVersionDelete")
+	beego.Router("/admin/settings", &controllers.AdminController{}, "get:Settings;post:SaveSettings")
 
 	// Repo 路由
 	beego.Router("/repos", &controllers.RepoController{}, "get:List")
