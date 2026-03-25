@@ -46,7 +46,7 @@ epics:
 
   - id: epic-2
     title: 代码质量管控（第二阶段）
-    status: in-progress
+    status: done
     stories:
       - id: 2-1
         title: PC-Lint 集成
@@ -54,36 +54,36 @@ epics:
         file: stories/2-1-pclint-integration.md
       - id: 2-2
         title: Git 提交规范检查
-        status: backlog
+        status: done
         file: null
       - id: 2-3
         title: AI 代码审查集成
-        status: backlog
+        status: done
         file: null
       - id: 2-4
         title: 聚合审查报告展示
-        status: backlog
+        status: done
         file: null
 
   - id: epic-3
     title: 管理完善（第三阶段）
-    status: backlog
+    status: done
     stories:
       - id: 3-1
         title: 角色权限模式切换
-        status: backlog
+        status: done
         file: null
       - id: 3-2
         title: 管理员团队视图
-        status: backlog
+        status: done
         file: null
       - id: 3-3
         title: 外部 Webhook 回调通知
-        status: backlog
+        status: done
         file: null
       - id: 3-4
         title: PC-Lint 配置文件管理界面
-        status: backlog
+        status: done
         file: null
 
 retrospectives:
