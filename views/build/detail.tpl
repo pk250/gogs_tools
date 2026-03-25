@@ -64,6 +64,25 @@
     </div>
     {{end}}
 
+    {{if .hasLint}}
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>Lint 检查结果
+          {{if eq .lintResult.Status "pass"}}<span class="label label-success">通过</span>{{end}}
+          {{if eq .lintResult.Status "warn"}}<span class="label label-warning">警告</span>{{end}}
+          {{if eq .lintResult.Status "fail"}}<span class="label label-danger">失败</span>{{end}}
+          {{if eq .lintResult.Status "skip"}}<span class="label label-default">跳过</span>{{end}}
+        </h5>
+      </div>
+      <div class="ibox-content">
+        <p>{{.lintResult.Summary}}</p>
+        {{if .lintResult.Detail}}
+        <pre style="max-height:300px;overflow-y:auto;background:#1a1a2e;color:#e0e0e0;padding:12px;">{{.lintResult.Detail}}</pre>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
   </div>
 </div>
 </div>

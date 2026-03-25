@@ -54,6 +54,7 @@ func runWorker(task models.BuildTask) {
 		UpdateStatus(task.Id, models.TaskStatusFailed)
 	} else {
 		UpdateStatus(task.Id, models.TaskStatusSuccess)
+		go RunLint(task)
 	}
 
 	// reload task to get FinishedAt/LogPath populated

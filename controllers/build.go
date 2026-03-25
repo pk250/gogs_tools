@@ -87,10 +87,19 @@ func (this *BuildController) Detail() {
 		}
 	}
 
+	// fetch lint result if present
+	var lintResult models.ReviewResult
+	hasLint := o.QueryTable("review_result").
+		Filter("TaskId", taskId).
+		Filter("ReviewType", models.ReviewTypeLint).
+		One(&lintResult) == nil
+
 	this.Data["task"] = task
 	this.Data["statusClass"] = statusClass
 	this.Data["triggerMode"] = cfg.TriggerMode
 	this.Data["artifacts"] = artifacts
+	this.Data["lintResult"] = lintResult
+	this.Data["hasLint"] = hasLint
 	this.Data["menu"] = "dashboard"
 	this.Layout = "index.tpl"
 	this.TplName = "build/detail.tpl"
