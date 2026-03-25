@@ -1,0 +1,101 @@
+# Sprint Status - gogs_tools
+# Generated: 2026-03-25
+# Tracking System: file-system
+
+project: gogs_tools
+project_key: NOKEY
+last_updated: '2026-03-28'
+
+epics:
+  - id: epic-1
+    title: 核心编译流水线（MVP 第一阶段）
+    status: done
+    stories:
+      - id: 1-1
+        title: 数据库模型与迁移
+        status: done
+        file: stories/1-1-database-models.md
+      - id: 1-2
+        title: Keil 版本管理（管理员）
+        status: done
+        file: stories/1-2-keil-version-management.md
+      - id: 1-3
+        title: 仓库编译配置
+        status: done
+        file: stories/1-3-repo-build-config.md
+      - id: 1-4
+        title: 任务队列引擎
+        status: done
+        file: stories/1-4-task-queue-engine.md
+      - id: 1-5
+        title: Keil 编译进程执行
+        status: done
+        file: stories/1-5-keil-compiler-execution.md
+      - id: 1-6
+        title: WebSocket 实时日志推送
+        status: done
+        file: stories/1-6-websocket-log-streaming.md
+      - id: 1-7
+        title: Dashboard 提交列表与任务详情页
+        status: done
+        file: stories/1-7-dashboard-task-detail.md
+      - id: 1-8
+        title: 邮件通知
+        status: done
+        file: stories/1-8-email-notification.md
+
+  - id: epic-2
+    title: 代码质量管控（第二阶段）
+    status: in-progress
+    stories:
+      - id: 2-1
+        title: PC-Lint 集成
+        status: done
+        file: stories/2-1-pclint-integration.md
+      - id: 2-2
+        title: Git 提交规范检查
+        status: backlog
+        file: null
+      - id: 2-3
+        title: AI 代码审查集成
+        status: backlog
+        file: null
+      - id: 2-4
+        title: 聚合审查报告展示
+        status: backlog
+        file: null
+
+  - id: epic-3
+    title: 管理完善（第三阶段）
+    status: backlog
+    stories:
+      - id: 3-1
+        title: 角色权限模式切换
+        status: backlog
+        file: null
+      - id: 3-2
+        title: 管理员团队视图
+        status: backlog
+        file: null
+      - id: 3-3
+        title: 外部 Webhook 回调通知
+        status: backlog
+        file: null
+      - id: 3-4
+        title: PC-Lint 配置文件管理界面
+        status: backlog
+        file: null
+
+retrospectives:
+  - epic: epic-1
+    status: optional
+  - epic: epic-2
+    status: optional
+  - epic: epic-3
+    status: optional
+
+notes: |
+  Epic 1 为 MVP 必须完成项，建议按 Story 顺序开发（1-1 依赖先行）。
+  Epic 2 依赖 Epic 1 完成后开始。
+  Epic 3 可与 Epic 2 并行但建议顺序进行。
+  开始开发前，使用 CS（创建故事）为每个 Story 生成详细实现文档。
