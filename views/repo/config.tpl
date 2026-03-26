@@ -50,6 +50,10 @@
             <label>Webhook URL</label>
             <input type="text" name="webhook_url" class="form-control" value="{{.config.WebhookUrl}}" placeholder="https://your-server/callback">
           </div>
+          <div class="form-group" id="webhookSecretGroup" {{if not .config.WebhookEnabled}}style="display:none"{{end}}>
+            <label>Webhook 密钥 <small class="text-muted">（与 Gogs 仓库 Webhook 设置中的密钥一致，留空则不校验签名）</small></label>
+            <input type="text" name="webhook_secret" class="form-control" value="{{.config.WebhookSecret}}" placeholder="留空则不校验签名">
+          </div>
           <div class="form-group">
             <button type="button" class="btn btn-primary" onclick="saveConfig()" {{if not .canEdit}}disabled{{end}}>保存配置</button>
             <a href="/repos" class="btn btn-default">返回列表</a>
@@ -97,8 +101,10 @@
 $('input[name="webhook_enabled"]').change(function() {
     if ($(this).is(':checked')) {
         $('#webhookUrlGroup').show();
+        $('#webhookSecretGroup').show();
     } else {
         $('#webhookUrlGroup').hide();
+        $('#webhookSecretGroup').hide();
     }
 });
 
@@ -109,7 +115,8 @@ function saveConfig() {
         artifact_name: $("input[name='artifact_name']").val(),
         notify_emails: $("input[name='notify_emails']").val(),
         webhook_enabled: $("input[name='webhook_enabled']").is(':checked'),
-        webhook_url: $("input[name='webhook_url']").val()
+        webhook_url: $("input[name='webhook_url']").val(),
+        webhook_secret: $("input[name='webhook_secret']").val()
     };
 
     $.post('/repos/{{.repoName}}/config', formData, function(resp) {

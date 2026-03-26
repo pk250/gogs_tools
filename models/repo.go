@@ -13,6 +13,7 @@ type RepoConfig struct {
 	NotifyEmails   string    `orm:"type(text);null"`            // 逗号分隔的邮件列表
 	WebhookEnabled bool      `orm:"default(false)"`
 	WebhookUrl     string    `orm:"size(512);null"`
+	WebhookSecret  string    `orm:"size(128);null"`              // Gogs Webhook 密钥，用于 HMAC-SHA256 验签
 	LintConfigPath string    `orm:"size(512);null"`             // .lnt 文件服务器路径
 	CreatedAt      time.Time `orm:"auto_now_add;type(datetime)"`
 	UpdatedAt      time.Time `orm:"auto_now;type(datetime)"`

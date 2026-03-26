@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"gogs_tools/models"
@@ -25,7 +28,21 @@ func (this *GogsControllers) Post() {
 		return
 	}
 
+	// Webhook 密钥验签（按仓库配置）
 	o := orm.NewOrm()
+	var repoCfgForSig models.RepoConfig
+	if err := o.QueryTable("repo_config").Filter("RepoName", gogs.Repository.Name).One(&repoCfgForSig); err == nil && repoCfgForSig.WebhookSecret != "" {
+		sig := this.Ctx.Request.Header.Get("X-Gogs-Signature")
+		mac := hmac.New(sha256.New, []byte(repoCfgForSig.WebhookSecret))
+		mac.Write(data)
+		expected := hex.EncodeToString(mac.Sum(nil))
+		if !hmac.Equal([]byte(sig), []byte(expected)) {
+			this.Ctx.ResponseWriter.WriteHeader(401)
+			this.Data["json"] = map[string]interface{}{"status": 0, "msg": "Webhook 签名校验失败"}
+			this.ServeJSON()
+			return
+		}
+	}
 	for _, commit := range gogs.Commits {
 		gogsDB := models.GogsDB{Ref: gogs.Ref, Before: gogs.Before, After: gogs.After,
 			Commits_Id:      commit.Id,
