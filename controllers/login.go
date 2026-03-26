@@ -33,6 +33,12 @@ func (this *LoginController) Post() {
 		return
 	}
 
+	if !user.IsActive {
+		this.Data["json"] = map[string]interface{}{"status": 0, "msg": "账号已被禁用，请联系管理员"}
+		this.ServeJSON()
+		return
+	}
+
 	o.Update(&user)
 	this.SetSession("UserData", user)
 	this.Data["json"] = map[string]interface{}{"status": 1, "msg": "登录成功", "url": "/"}

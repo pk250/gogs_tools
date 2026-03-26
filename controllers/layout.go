@@ -47,7 +47,44 @@ func (this *LayoutController) Messages() {
 }
 
 func (this *LayoutController) Account() {
+	o := orm.NewOrm()
+	users := this.Ctx.Input.Session("UserData")
+	if users == nil {
+		this.Redirect("/login", 302)
+		return
+	}
+	user := models.Users{Id: users.(models.Users).Id}
+	o.Read(&user)
+	this.Data["email"] = user.Email
 	this.Data["menu"] = "account"
 	this.Layout = "index.html"
-	this.TplName = "knowledge.html"
+	this.TplName = "account.tpl"
+}
+
+func (this *LayoutController) SaveAccount() {
+	o := orm.NewOrm()
+	users := this.Ctx.Input.Session("UserData")
+	if users == nil {
+		this.Data["json"] = map[string]interface{}{"code": 401, "message": "未登录"}
+		this.ServeJSON()
+		return
+	}
+	user := models.Users{Id: users.(models.Users).Id}
+	if err := o.Read(&user); err != nil {
+		this.Data["json"] = map[string]interface{}{"code": 404, "message": "用户不存在"}
+		this.ServeJSON()
+		return
+	}
+	email := this.GetString("email")
+	newPwd := this.GetString("new_password")
+	if email != "" {
+		user.Email = email
+	}
+	if newPwd != "" {
+		user.Password = newPwd
+	}
+	o.Update(&user, "Email", "Password")
+	this.SetSession("UserData", user)
+	this.Data["json"] = map[string]interface{}{"code": 0, "message": "保存成功"}
+	this.ServeJSON()
 }

@@ -16,6 +16,9 @@ func init() {
 	beego.AutoRouter(&controllers.LayoutController{})
 	beego.Router("/gogs", &controllers.GogsControllers{})
 
+	// 个人账号
+	beego.Router("/account", &controllers.LayoutController{}, "get:Account;post:SaveAccount")
+
 	// Admin 用户管理
 	beego.Router("/admin/users", &controllers.AdminController{}, "get:UserList")
 	beego.Router("/admin/users/:id/toggle-admin", &controllers.AdminController{}, "post:UserToggleAdmin")

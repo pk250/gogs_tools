@@ -41,6 +41,9 @@
               </td>
               <td>
                 <a href="/repos/{{$name}}/config" class="btn btn-xs btn-white">配置</a>
+                {{if and $cfg.KeilVersionId (eq $cfg.TriggerMode "manual")}}
+                <button class="btn btn-xs btn-primary m-l-xs" onclick="triggerBuild('{{$name}}')">立即编译</button>
+                {{end}}
               </td>
             </tr>
             {{end}}
@@ -56,3 +59,26 @@
         <strong>Copyright</strong> Dakewe &copy; 2023-2033
     </div>
 </div>
+<script>
+function triggerBuild(repoName) {
+    if (!confirm('确认立即触发「' + repoName + '」编译？')) return;
+    $.ajax({
+        url: '/api/build/trigger',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({repo_name: repoName, commit_hash: 'manual', commit_msg: '手动触发编译', author: ''}),
+        success: function(res) {
+            if (res.code === 0) {
+                toastr.success('任务已创建，正在跳转...');
+                setTimeout(function(){ window.location.href = '/build/detail/' + res.data.task_id; }, 1000);
+            } else {
+                toastr.error(res.message || '触发失败');
+            }
+        },
+        error: function(xhr) {
+            var res = xhr.responseJSON;
+            toastr.error(res ? res.message : '请求失败');
+        }
+    });
+}
+</script>
