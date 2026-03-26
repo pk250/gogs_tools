@@ -114,7 +114,6 @@ func (this *RepoController) SaveConfig() {
 	notifyEmails := this.GetString("notify_emails")
 	webhookEnabled, _ := this.GetBool("webhook_enabled")
 	webhookUrl := this.GetString("webhook_url")
-	lintConfigPath := this.GetString("lint_config_path")
 
 	if artifactName == "" {
 		artifactName = repoName
@@ -128,7 +127,6 @@ func (this *RepoController) SaveConfig() {
 		NotifyEmails:   notifyEmails,
 		WebhookEnabled: webhookEnabled,
 		WebhookUrl:     webhookUrl,
-		LintConfigPath: lintConfigPath,
 	}
 
 	exist := models.RepoConfig{RepoName: repoName}
@@ -138,7 +136,7 @@ func (this *RepoController) SaveConfig() {
 	} else {
 		config.Id = exist.Id
 		_, err = o.Update(&config, "KeilVersionId", "TriggerMode", "ArtifactName",
-			"NotifyEmails", "WebhookEnabled", "WebhookUrl", "LintConfigPath")
+			"NotifyEmails", "WebhookEnabled", "WebhookUrl")
 	}
 
 	if err != nil {

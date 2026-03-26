@@ -134,6 +134,12 @@ func Run(task models.BuildTask) error {
 		"finished_at":   time.Now(),
 	})
 
+	exitCode := 0
+	if cmd.ProcessState != nil {
+		exitCode = cmd.ProcessState.ExitCode()
+	}
+	o.QueryTable("build_task").Filter("Id", task.Id).Update(orm.Params{"exit_code": exitCode})
+
 	if cmdErr != nil {
 		logs.Error("[compiler] 任务 %d 编译失败，退出码非0: %v", task.Id, cmdErr)
 		return fmt.Errorf("编译失败: %w", cmdErr)
@@ -148,13 +154,15 @@ func Run(task models.BuildTask) error {
 }
 
 // copyArtifacts 复制编译产物到 /data/artifacts/{taskId}/
+// 若 artifactName 非空且只找到一个主产物，则按配置名重命名（保留原扩展名）
 func copyArtifacts(task models.BuildTask, repoDir, artifactName string) error {
 	destDir := filepath.Join(ArtifactsDir, fmt.Sprintf("%d", task.Id))
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return fmt.Errorf("创建产物目录失败: %w", err)
 	}
 	exts := strings.Fields(ArtifactExts)
-	var copied int
+	type srcFile struct{ path, name string }
+	var files []srcFile
 	filepath.Walk(repoDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
@@ -162,15 +170,26 @@ func copyArtifacts(task models.BuildTask, repoDir, artifactName string) error {
 		ext := strings.ToLower(filepath.Ext(path))
 		for _, e := range exts {
 			if ext == e {
-				if copyErr := copyFile(path, filepath.Join(destDir, info.Name())); copyErr == nil {
-					copied++
-				}
+				files = append(files, srcFile{path, info.Name()})
 			}
 		}
 		return nil
 	})
-	if copied == 0 {
+	if len(files) == 0 {
 		return fmt.Errorf("未找到任何产物文件（.axf/.hex/.bin/.map）")
+	}
+	for i, f := range files {
+		destName := f.name
+		// 单个产物且配置了 ArtifactName 时按配置重命名
+		if len(files) == 1 && artifactName != "" {
+			ext := filepath.Ext(f.name)
+			base := strings.TrimSuffix(artifactName, ext)
+			destName = base + ext
+		}
+		_ = i
+		if copyErr := copyFile(f.path, filepath.Join(destDir, destName)); copyErr != nil {
+			logs.Warn("[compiler] 复制产物 %s 失败: %v", f.name, copyErr)
+		}
 	}
 	return nil
 }

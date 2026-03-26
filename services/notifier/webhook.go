@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"gogs_tools/models"
@@ -31,7 +32,6 @@ type webhookPayload struct {
 func SendWebhook(task models.BuildTask) {
 	if err := sendWebhook(task); err != nil {
 		logs.Warn("[Webhook] 回调失败 task=%d err=%v", task.Id, err)
-		logs.Error("[Webhook] task=%d 回调失败记录: %s", task.Id, err.Error())
 	}
 }
 
@@ -48,7 +48,7 @@ func sendWebhook(task models.BuildTask) error {
 	var appCfg models.SysConfig
 	baseURL := ""
 	if err := o.QueryTable("sys_config").Filter("ConfigKey", models.ConfigKeyAppBaseURL).One(&appCfg); err == nil {
-		baseURL = appCfg.ConfigVal
+		baseURL = strings.TrimRight(appCfg.ConfigVal, "/")
 	}
 
 	duration := ""

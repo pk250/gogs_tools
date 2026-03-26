@@ -63,6 +63,7 @@ func runWorker(task models.BuildTask) {
 	o := orm.NewOrm()
 	updated := models.BuildTask{Id: task.Id}
 	if err2 := o.Read(&updated); err2 == nil {
+		GlobalHub.BroadcastComplete(task.Id, updated.Status)
 		go notifier.SendBuildResult(updated)
 		go notifier.SendWebhook(updated)
 	}
