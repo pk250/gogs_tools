@@ -79,6 +79,7 @@
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> <span class="nav-label">系统管理</span> <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li><a href="/admin/keil-versions">Keil 版本管理</a></li>
+                            <li><a href="/admin/users">用户管理</a></li>
                             <li><a href="/admin/settings">系统设置</a></li>
                             <li><a href="/admin/team">团队视图</a></li>
                         </ul>

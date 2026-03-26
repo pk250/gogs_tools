@@ -250,6 +250,100 @@ func (this *AdminController) SaveSettings() {
 	this.ServeJSON()
 }
 
+// UserList GET /admin/users
+func (this *AdminController) UserList() {
+	o := orm.NewOrm()
+	const pageSize = 20
+
+	pageNum, _ := this.GetInt64("page", 1)
+	if pageNum < 1 {
+		pageNum = 1
+	}
+
+	qs := o.QueryTable("users")
+	count, _ := qs.Count()
+	var users []models.Users
+	qs.OrderBy("Id").Limit(pageSize, int(pageSize*(pageNum-1))).All(&users)
+
+	totalPages := (count + int64(pageSize) - 1) / int64(pageSize)
+	if totalPages == 0 {
+		totalPages = 1
+	}
+	pageList := make([]int64, totalPages)
+	var i int64
+	for i = 0; i < totalPages; i++ {
+		pageList[i] = i + 1
+	}
+
+	this.Data["users"] = users
+	this.Data["count"] = count
+	this.Data["page"] = pageNum
+	this.Data["totalPages"] = totalPages
+	this.Data["prevPage"] = pageNum - 1
+	this.Data["nextPage"] = pageNum + 1
+	this.Data["pageList"] = pageList
+	this.Data["menu"] = "admin"
+	this.Layout = "index.html"
+	this.TplName = "admin/users.tpl"
+}
+
+// UserToggleAdmin POST /admin/users/:id/toggle-admin
+func (this *AdminController) UserToggleAdmin() {
+	idStr := this.Ctx.Input.Param(":id")
+	uid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || uid <= 0 {
+		this.Data["json"] = map[string]interface{}{"code": 400, "message": "无效用户ID"}
+		this.ServeJSON()
+		return
+	}
+	o := orm.NewOrm()
+	user := models.Users{Id: uid}
+	if err := o.Read(&user); err != nil {
+		this.Data["json"] = map[string]interface{}{"code": 404, "message": "用户不存在"}
+		this.ServeJSON()
+		return
+	}
+	// 防止管理员撤销自己的权限
+	self := this.Ctx.Input.Session("UserData")
+	if self != nil && self.(models.Users).Id == uid {
+		this.Data["json"] = map[string]interface{}{"code": 400, "message": "不能修改自己的管理员权限"}
+		this.ServeJSON()
+		return
+	}
+	user.IsAdmin = !user.IsAdmin
+	o.Update(&user, "IsAdmin")
+	this.Data["json"] = map[string]interface{}{"code": 0, "isAdmin": user.IsAdmin}
+	this.ServeJSON()
+}
+
+// UserToggleActive POST /admin/users/:id/toggle-active
+func (this *AdminController) UserToggleActive() {
+	idStr := this.Ctx.Input.Param(":id")
+	uid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || uid <= 0 {
+		this.Data["json"] = map[string]interface{}{"code": 400, "message": "无效用户ID"}
+		this.ServeJSON()
+		return
+	}
+	o := orm.NewOrm()
+	user := models.Users{Id: uid}
+	if err := o.Read(&user); err != nil {
+		this.Data["json"] = map[string]interface{}{"code": 404, "message": "用户不存在"}
+		this.ServeJSON()
+		return
+	}
+	self := this.Ctx.Input.Session("UserData")
+	if self != nil && self.(models.Users).Id == uid {
+		this.Data["json"] = map[string]interface{}{"code": 400, "message": "不能禁用自己的账号"}
+		this.ServeJSON()
+		return
+	}
+	user.IsActive = !user.IsActive
+	o.Update(&user, "IsActive")
+	this.Data["json"] = map[string]interface{}{"code": 0, "isActive": user.IsActive}
+	this.ServeJSON()
+}
+
 // TeamView GET /admin/team
 func (this *AdminController) TeamView() {
 	o := orm.NewOrm()

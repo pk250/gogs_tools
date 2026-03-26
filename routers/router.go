@@ -16,6 +16,11 @@ func init() {
 	beego.AutoRouter(&controllers.LayoutController{})
 	beego.Router("/gogs", &controllers.GogsControllers{})
 
+	// Admin 用户管理
+	beego.Router("/admin/users", &controllers.AdminController{}, "get:UserList")
+	beego.Router("/admin/users/:id/toggle-admin", &controllers.AdminController{}, "post:UserToggleAdmin")
+	beego.Router("/admin/users/:id/toggle-active", &controllers.AdminController{}, "post:UserToggleActive")
+
 	// Admin 路由（validate-path 必须在 /:id 前注册）
 	beego.Router("/admin/keil-versions/validate-path", &controllers.AdminController{}, "post:KeilVersionValidatePath")
 	beego.Router("/admin/keil-versions", &controllers.AdminController{}, "get:KeilVersionList;post:KeilVersionCreate")
