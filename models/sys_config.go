@@ -18,6 +18,7 @@ const (
 	ConfigKeyAIApiKey     = "ai_api_key"     // 加密存储
 	ConfigKeyAIModel      = "ai_model"       // 模型名称
 	ConfigKeyAIPrompt     = "ai_prompt"      // 审查提示词
+	ConfigKeyAIBaseURL    = "ai_base_url"    // 自定义 API Base URL（OpenAI兼容接口）
 	ConfigKeySMTPHost     = "smtp_host"
 	ConfigKeySMTPPort     = "smtp_port"
 	ConfigKeySMTPUser     = "smtp_user"

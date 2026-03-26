@@ -59,6 +59,11 @@
             <label>审查提示词</label>
             <textarea class="form-control" name="ai_prompt" rows="3" placeholder="请对以下代码变更进行审查...">{{index .cfg "ai_prompt"}}</textarea>
           </div>
+          <div class="form-group">
+            <label>API Base URL（可选，兼容 OpenAI 接口的自定义地址）</label>
+            <input type="text" class="form-control" name="ai_base_url" value="{{index .cfg "ai_base_url"}}" placeholder="https://api.openai.com/v1">
+            <p class="help-block">留空则使用服务商默认地址。</p>
+          </div>
           <button type="submit" class="btn btn-primary">保存</button>
           <span id="ai-save-msg" style="margin-left:12px;display:none;"></span>
         </form>

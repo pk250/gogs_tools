@@ -188,6 +188,7 @@ func (this *AdminController) Settings() {
 		models.ConfigKeyAIProvider,
 		models.ConfigKeyAIModel,
 		models.ConfigKeyAIPrompt,
+		models.ConfigKeyAIBaseURL,
 		models.ConfigKeyPermissionMode,
 		models.ConfigKeyPCLintExe,
 	}
@@ -219,6 +220,7 @@ func (this *AdminController) SaveSettings() {
 		models.ConfigKeyAIApiKey:           true,
 		models.ConfigKeyAIModel:            false,
 		models.ConfigKeyAIPrompt:           false,
+		models.ConfigKeyAIBaseURL:          false,
 		models.ConfigKeyPermissionMode:     false,
 		models.ConfigKeyPCLintExe:           false,
 	}

@@ -15,12 +15,13 @@ type AIReviewer interface {
 }
 
 // New 根据 provider 名称返回对应适配器
-func New(provider, apiKey, model string) (AIReviewer, error) {
+// baseURL 为空时使用服务商默认地址
+func New(provider, apiKey, model, baseURL string) (AIReviewer, error) {
 	switch provider {
 	case "claude":
 		return &ClaudeReviewer{APIKey: apiKey, Model: model}, nil
 	case "openai":
-		return &OpenAIReviewer{APIKey: apiKey, Model: model}, nil
+		return &OpenAIReviewer{APIKey: apiKey, Model: model, BaseURL: baseURL}, nil
 	default:
 		return nil, errors.New("未知 AI 服务商: " + provider)
 	}

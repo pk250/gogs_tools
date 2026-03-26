@@ -24,6 +24,7 @@ func RunAIReview(task models.BuildTask) {
 	apiKeyEnc := kv[models.ConfigKeyAIApiKey]
 	model := kv[models.ConfigKeyAIModel]
 	prompt := kv[models.ConfigKeyAIPrompt]
+	baseURL := kv[models.ConfigKeyAIBaseURL]
 
 	if provider == "" || apiKeyEnc == "" {
 		saveAIResult(o, task.Id, models.ReviewStatusSkip, "未配置 AI 服务商或 API Key", "")
@@ -50,7 +51,7 @@ func RunAIReview(task models.BuildTask) {
 	}
 
 	// 4. 调用 AI
-	reviewer, err := ai.New(provider, apiKey, model)
+	reviewer, err := ai.New(provider, apiKey, model, baseURL)
 	if err != nil {
 		logs.Error("[AIReview] 初始化 AI 适配器失败: %v", err)
 		saveAIResult(o, task.Id, models.ReviewStatusSkip, fmt.Sprintf("AI 适配器初始化失败: %v", err), "")
@@ -75,6 +76,7 @@ func loadAIConfig(o orm.Ormer) map[string]string {
 		models.ConfigKeyAIApiKey,
 		models.ConfigKeyAIModel,
 		models.ConfigKeyAIPrompt,
+		models.ConfigKeyAIBaseURL,
 	}
 	kv := make(map[string]string)
 	for _, k := range keys {

@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
 // OpenAIReviewer 调用 OpenAI Chat Completions API
 type OpenAIReviewer struct {
-	APIKey string
-	Model  string
+	APIKey  string
+	Model   string
+	BaseURL string // 自定义 Base URL，留空则使用官方地址
 }
 
 func (r *OpenAIReviewer) Review(prompt, diff string) (string, error) {
@@ -38,7 +40,11 @@ func (r *OpenAIReviewer) Review(prompt, diff string) (string, error) {
 	}
 
 	client := &http.Client{Timeout: 120 * time.Second}
-	req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewReader(bs))
+	apiURL := "https://api.openai.com/v1/chat/completions"
+	if r.BaseURL != "" {
+		apiURL = strings.TrimRight(r.BaseURL, "/") + "/chat/completions"
+	}
+	req, err := http.NewRequest("POST", apiURL, bytes.NewReader(bs))
 	if err != nil {
 		return "", err
 	}
