@@ -60,6 +60,30 @@ func (this *DashboardController) Index() {
 		}
 	}
 
+	// 全部时间统计
+	var totalSuccess, totalFailed int64
+	o.Raw("SELECT COUNT(*) FROM build_task WHERE status=?", models.TaskStatusSuccess).QueryRow(&totalSuccess)
+	o.Raw("SELECT COUNT(*) FROM build_task WHERE status=?", models.TaskStatusFailed).QueryRow(&totalFailed)
+
+	// Top 5 仓库构建次数
+	var topRepos []orm.Params
+	o.Raw("SELECT repo_name, COUNT(*) as cnt FROM build_task GROUP BY repo_name ORDER BY cnt DESC LIMIT 5").Values(&topRepos)
+
+	// 最近 7 天趋势
+	type DayTrend struct {
+		Day     string
+		Success int64
+		Failed  int64
+	}
+	var trends []DayTrend
+	for i := 6; i >= 0; i-- {
+		day := time.Now().AddDate(0, 0, -i).Format("2006-01-02")
+		var s, f int64
+		o.Raw("SELECT COUNT(*) FROM build_task WHERE status=? AND DATE(created_at)=?", models.TaskStatusSuccess, day).QueryRow(&s)
+		o.Raw("SELECT COUNT(*) FROM build_task WHERE status=? AND DATE(created_at)=?", models.TaskStatusFailed, day).QueryRow(&f)
+		trends = append(trends, DayTrend{Day: day[5:], Success: s, Failed: f})
+	}
+
 	this.Data["tasks"] = tasks
 	this.Data["count"] = count
 	this.Data["page"] = pageNum
@@ -73,6 +97,10 @@ func (this *DashboardController) Index() {
 	this.Data["todaySuccess"] = todaySuccess
 	this.Data["todayFailed"] = todayFailed
 	this.Data["todayRunning"] = todayRunning
+	this.Data["totalSuccess"] = totalSuccess
+	this.Data["totalFailed"] = totalFailed
+	this.Data["topRepos"] = topRepos
+	this.Data["trends"] = trends
 
 	// build review status summary per task
 	type reviewSummary struct {

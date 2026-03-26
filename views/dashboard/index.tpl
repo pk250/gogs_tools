@@ -1,27 +1,71 @@
 <div class="wrapper wrapper-content">
 <div class="row">
   <!-- Stats cards -->
-  <div class="col-lg-4">
+  <div class="col-lg-2">
     <div class="ibox">
       <div class="ibox-content">
         <h1 class="no-margins text-success">{{.todaySuccess}}</h1>
-        <small>今日编译成功</small>
+        <small>今日成功</small>
       </div>
     </div>
   </div>
-  <div class="col-lg-4">
+  <div class="col-lg-2">
     <div class="ibox">
       <div class="ibox-content">
         <h1 class="no-margins text-danger">{{.todayFailed}}</h1>
-        <small>今日编译失败</small>
+        <small>今日失败</small>
       </div>
     </div>
   </div>
-  <div class="col-lg-4">
+  <div class="col-lg-2">
     <div class="ibox">
       <div class="ibox-content">
         <h1 class="no-margins text-warning">{{.todayRunning}}</h1>
         <small>编译进行中</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="ibox">
+      <div class="ibox-content">
+        <h1 class="no-margins text-success">{{.totalSuccess}}</h1>
+        <small>累计编译成功</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="ibox">
+      <div class="ibox-content">
+        <h1 class="no-margins text-danger">{{.totalFailed}}</h1>
+        <small>累计编译失败</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Top 5 repos -->
+  <div class="col-lg-4">
+    <div class="ibox">
+      <div class="ibox-title"><h5>Top 5 活跃仓库</h5></div>
+      <div class="ibox-content">
+        <table class="table table-condensed table-hover">
+          <thead><tr><th>仓库</th><th>构建次数</th></tr></thead>
+          <tbody>
+          {{range .topRepos}}
+          <tr><td>{{index . "repo_name"}}</td><td><strong>{{index . "cnt"}}</strong></td></tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- 7-day trend -->
+  <div class="col-lg-8">
+    <div class="ibox">
+      <div class="ibox-title"><h5>最近 7 天构建趋势</h5></div>
+      <div class="ibox-content">
+        <canvas id="trendChart" height="80"></canvas>
       </div>
     </div>
   </div>
@@ -139,6 +183,7 @@
         <strong>Copyright</strong> Dakewe &copy; 2023-2033
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3/dist/chart.min.js"></script>
 <script>
 (function(){
     // Auto-refresh running rows via polling every 5s
@@ -148,5 +193,28 @@
         setTimeout(function(){ location.reload(); }, 5000);
     }
     refreshRunning();
+
+    // 7-day trend chart
+    var labels = [{{range .trends}}"{{.Day}}",{{end}}];
+    var successData = [{{range .trends}}{{.Success}},{{end}}];
+    var failedData  = [{{range .trends}}{{.Failed}},{{end}}];
+    var ctx = document.getElementById('trendChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {label: '成功', data: successData, backgroundColor: 'rgba(26,179,148,0.7)'},
+                    {label: '失败', data: failedData,  backgroundColor: 'rgba(237,85,101,0.7)'}
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'top'}},
+                scales: {x: {stacked: false}, y: {beginAtZero: true, ticks: {stepSize: 1}}}
+            }
+        });
+    }
 })();
 </script>

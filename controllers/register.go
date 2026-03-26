@@ -30,6 +30,7 @@ func (this *RegisterController) Post() {
 	if err == orm.ErrNoRows {
 		user.Email = email
 		user.Password = password
+		user.IsActive = true
 		_, err = o.Insert(&user)
 		if err != nil {
 			this.Data["json"] = map[string]interface{}{"status": 0, "msg": "注册失败"}
