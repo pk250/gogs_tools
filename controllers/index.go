@@ -7,5 +7,5 @@ type IndexController struct {
 func (this *IndexController) Get() {
 	// this.Layout = "index.html"
 	// this.TplName = "datainfo.html"
-	this.Redirect("layout/datainfo", 302)
+	this.Redirect("/dashboard", 302)
 }

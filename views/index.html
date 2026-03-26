@@ -71,9 +71,6 @@
                     <li class="{{if eq .menu "dashboard"}}active{{end}}">
                         <a href="/dashboard"><i class="fa fa-dashboard"></i> <span class="nav-label">编译任务</span></a>
                     </li>
-                    <li class="{{if eq "datainfo" .menu}}active{{end}}">
-                        <a href="/layout/datainfo"><i class="fa fa-cubes"></i> <span class="nav-label">编译列表</span></a>
-                    </li>
                     <li class="{{if eq .menu "repos"}}active{{end}}">
                         <a href="/repos"><i class="fa fa-code-fork fa-fw"></i> <span class="nav-label">仓库配置</span></a>
                     </li>

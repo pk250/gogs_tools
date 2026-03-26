@@ -55,15 +55,15 @@ epics:
       - id: 2-2
         title: Git 提交规范检查
         status: done
-        file: null
+        file: stories/2-2-git-commit-check.md
       - id: 2-3
         title: AI 代码审查集成
         status: done
-        file: null
+        file: stories/2-3-ai-review.md
       - id: 2-4
         title: 聚合审查报告展示
         status: done
-        file: null
+        file: stories/2-4-aggregated-review.md
 
   - id: epic-3
     title: 管理完善（第三阶段）
@@ -72,19 +72,19 @@ epics:
       - id: 3-1
         title: 角色权限模式切换
         status: done
-        file: null
+        file: stories/3-1-permission-mode.md
       - id: 3-2
         title: 管理员团队视图
         status: done
-        file: null
+        file: stories/3-2-admin-team-view.md
       - id: 3-3
         title: 外部 Webhook 回调通知
         status: done
-        file: null
+        file: stories/3-3-webhook-notification.md
       - id: 3-4
         title: PC-Lint 配置文件管理界面
         status: done
-        file: null
+        file: stories/3-4-pclint-config-ui.md
 
 retrospectives:
   - epic: epic-1
